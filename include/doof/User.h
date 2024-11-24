@@ -15,7 +15,8 @@ private:
   string password;
 
 public:
-public:
+  User(const string& _name, const string& _email, const string& _contact, const string& _addr, const string& _pass);
+
   // Getters
   int getId() const;
   string getName() const;

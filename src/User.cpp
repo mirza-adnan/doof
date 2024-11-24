@@ -1,5 +1,13 @@
 #include "doof/User.h"
 
+User::User(const string& _name, const string& _email, const string& _contact, const string& _addr, const string& _pass) {
+  name = _name;
+  email = email;
+  contact = _contact;
+  address = _addr;
+  password = _pass;
+}
+
 // Getters
 int User::getId() const {
   return id;
