@@ -1,5 +1,7 @@
 #include "doof/User.h"
 
+User::User() {}
+
 User::User(const string& _name, const string& _email, const string& _contact, const string& _addr, const string& _pass) {
   name = _name;
   email = email;
@@ -8,7 +10,7 @@ User::User(const string& _name, const string& _email, const string& _contact, co
   password = _pass;
 }
 
-// Getters
+// getters
 int User::getId() const {
   return id;
 }
@@ -33,27 +35,27 @@ string User::getPassword() const {
   return password;
 }
 
-// Setters
-void User::setId(int id) {
-  this->id = id;
+// setters
+void User::setId(int _id) {
+  id = _id;
 }
 
-void User::setName(const string& name) {
-  this->name = name;
+void User::setName(const string& _name) {
+  name = _name;
 }
 
-void User::setEmail(const string& email) {
-  this->email = email;
+void User::setEmail(const string& _email) {
+  email = _email;
 }
 
-void User::setContact(const string& contact) {
-  this->contact = contact;
+void User::setContact(const string& _contact) {
+  contact = _contact;
 }
 
-void User::setAddress(const string& address) {
-  this->address = address;
+void User::setAddress(const string& _address) {
+  address = _address;
 }
 
-void User::setPassword(const string& password) {
-  this->password = password;
+void User::setPassword(const string& _password) {
+  password = _password;
 }
