@@ -3,10 +3,11 @@
 // Default constructor
 Food::Food() {}
 
-Food::Food(const string& _name, float _price, bool _available) {
+Food::Food(const string& _name, float _price, bool _available, int _restaurantId) {
   name = _name;
   price = _price;
   available = _available;
+  restaurantId = _restaurantId;
 }
 
 // getters
@@ -26,6 +27,10 @@ int Food::getId() const {
   return id;
 }
 
+int Food::getRestaurantId() const {
+  return restaurantId;
+}
+
 // setters
 void Food::setName(const string& _name) {
   name = _name;
@@ -41,4 +46,8 @@ void Food::setAvailable(bool _available) {
 
 void Food::setId(int _id) {
   id = _id;
+}
+
+void Food::setRestaurantId(int _restaurantId) {
+  restaurantId = _restaurantId;
 }
