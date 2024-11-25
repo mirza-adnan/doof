@@ -2,7 +2,7 @@
 
 Restaurant::Restaurant() {}
 
-Restaurant::Restaurant(RestaurantType _type) {
+Restaurant::Restaurant(const string& _name, const string& _email, const string& _contact, const string& _addr, const string& _pass, RestaurantType _type) : User(_name, _email, _contact, _addr, _pass) {
   type = _type;
 }
 

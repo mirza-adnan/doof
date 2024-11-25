@@ -6,8 +6,9 @@
 #include <vector>
 #include "doof/enums.h"
 #include "doof/Food.h"
+#include "doof/User.h"
 
-class Restaurant {
+class Restaurant : public User {
 private:
   RestaurantType type;
   vector<Food*> menu;
@@ -15,7 +16,7 @@ private:
 public:
   Restaurant();
 
-  Restaurant(RestaurantType _type);
+  Restaurant(const string& _name, const string& _email, const string& _contact, const string& _addr, const string& _pass, RestaurantType _type);
 
   ~Restaurant();
 
