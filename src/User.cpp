@@ -4,7 +4,7 @@ User::User() {}
 
 User::User(const string& _name, const string& _email, const string& _pass) {
   name = _name;
-  email = email;
+  email = _email;
   password = _pass;
 }
 
@@ -26,7 +26,7 @@ string User::getPassword() const {
 }
 
 // setters
-void User::setId(int _id) {
+void User::setId(const int _id) {
   id = _id;
 }
 
