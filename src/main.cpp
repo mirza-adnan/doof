@@ -1,11 +1,18 @@
 #include "sqlite3/sqlite3.h"
 #include <iostream>
+#include "doof/User.h"
+#include "doof/Restaurant.h"
+#include "doof/DB.h"
 using namespace std;
 
 int main() {
-  sqlite3* db;
-  int exit = sqlite3_open("./db/doof.dev.db", &db);
+  DB db;
+  // db.execute("DROP TABLE IF EXISTS User;");
+  // db.execute("DROP TABLE IF EXISTS Restaurant;");
+  db.createTables();
 
-  sqlite3_close(db);
-  return 0;
+  Restaurant res("bfc", "bfc@email.com", "password", "01610210210", "uttara, dhaka", RESTAURANT_TYPE_FAST_FOOD);
+
+  db.insertRestaurant(res);
+  db.getRestaurants();
 }
