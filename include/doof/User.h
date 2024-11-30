@@ -11,23 +11,29 @@ private:
   string name;
   string email;
   string password;
+  string address;
+  string contact;
 
 public:
   User();
 
-  User(const string& _name, const string& _email, const string& _pass);
+  User(const string& _name, const string& _email, const string& _pass, const string& _contact, const string& _addr);
 
-  // Getters
+  // getters
   int getId() const;
   string getName() const;
   string getEmail() const;
   string getPassword() const;
+  string getAddress() const;
+  string getContact() const;
 
-  // Setters
+  // setters
   void setId(const int _id);
   void setName(const string& _name);
   void setEmail(const string& _email);
   void setPassword(const string& _password);
+  void setAddress(const string& _addr);
+  void setContact(const string& _contact);
 };
 
 
