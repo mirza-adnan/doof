@@ -36,7 +36,19 @@ void DB::createTables() {
     "r_contact TEXT,"
     "r_type INTEGER NOT NULL CHECK (r_type in (0, 1, 2)));"
   );
-  cout << "Table created\n";
+
+  DB::execute(
+    "CREATE TABLE IF NOT EXISTS Food("
+    "f_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+    "f_name TEXT NOT NULL,"
+    "f_price REAL NOT NULL,"
+    "f_available INTEGER NOT NULL CHECK (f_available in (0, 1)),"
+    "r_id INTEGER NOT NULL,"
+    "FOREIGN KEY(r_id) REFERENCES Restaurant(r_id),"
+    "UNIQUE(f_name, r_id));"
+  );
+
+  cout << "Tables created\n";
 }
 
 bool DB::insertRestaurant(Restaurant& restaurant) const {
@@ -102,3 +114,31 @@ void DB::getRestaurants() const {
     cout << email << "\n";
   }
 }
+
+void DB::insertFood(Food& food) const {
+  sqlite3_stmt* stmt;
+  const char* sql = "INSERT INTO Food (f_name, f_price, f_available, r_id) VALUES (?, ?, ?, ?);";
+
+  if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+    cerr << "Error preparing INSERT statement(Food): " << sqlite3_errmsg(db) << "\n";
+    sqlite3_finalize(stmt);
+    return;
+  }
+
+  sqlite3_bind_text(stmt, 1, food.getName().c_str(), -1, SQLITE_STATIC);
+  sqlite3_bind_double(stmt, 2, food.getPrice());
+  sqlite3_bind_int(stmt, 3, food.isAvailable());
+  sqlite3_bind_int(stmt, 4, food.getRestaurantId());
+
+  if (sqlite3_step(stmt) != SQLITE_DONE) {
+    cerr << "Error executing INSERT statement(Food): " << sqlite3_errmsg(db) << "\n";
+    sqlite3_finalize(stmt);
+    return;
+  }
+
+  const int foodId = static_cast<int>(sqlite3_last_insert_rowid(db));
+  food.setId(foodId);
+
+  sqlite3_finalize(stmt);
+}
+

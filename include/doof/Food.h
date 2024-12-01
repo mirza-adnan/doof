@@ -26,10 +26,10 @@ public:
 
   // setters
   void setName(const string& _name);
-  void setPrice(float _price);
-  void setAvailable(bool _available);
-  void setId(int _id);
-  void setRestaurantId(int _restaurantId);
+  void setPrice(const float _price);
+  void setAvailable(const bool _available);
+  void setId(const int _id);
+  void setRestaurantId(const int _restaurantId);
 };
 
 #endif

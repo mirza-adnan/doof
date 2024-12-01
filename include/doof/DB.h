@@ -4,6 +4,7 @@
 #include <iostream>
 #include "sqlite3/sqlite3.h"
 #include "doof/Restaurant.h"
+#include "doof/Food.h"
 
 using namespace std;
 
@@ -20,6 +21,7 @@ public:
   void createTables();
   bool insertRestaurant(Restaurant& restaurant) const;
   void getRestaurants() const;
+  void insertFood(Food& food) const;
 };
 
 #endif

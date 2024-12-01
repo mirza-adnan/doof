@@ -36,11 +36,11 @@ void Food::setName(const string& _name) {
   name = _name;
 }
 
-void Food::setPrice(float _price) {
+void Food::setPrice(const float _price) {
   price = _price;
 }
 
-void Food::setAvailable(bool _available) {
+void Food::setAvailable(const bool _available) {
   available = _available;
 }
 
@@ -48,6 +48,6 @@ void Food::setId(int _id) {
   id = _id;
 }
 
-void Food::setRestaurantId(int _restaurantId) {
+void Food::setRestaurantId(const int _restaurantId) {
   restaurantId = _restaurantId;
 }
