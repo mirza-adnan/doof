@@ -1,2 +1,2 @@
 all:
-	g++ -o main sqlite3.o ./src/*.cpp -I ./include/
+	g++ -o main ./src/*.cpp -I ./include/ -L ./lib -lsqlite3
