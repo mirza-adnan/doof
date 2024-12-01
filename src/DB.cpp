@@ -4,6 +4,8 @@ DB::DB() {
   if (sqlite3_open("./db/doof.dev.db", &db) != SQLITE_OK) {
     cerr << "Error opening database: " << sqlite3_errmsg(db) << "\n";
   }
+
+  DB::execute("PRAGMA foreign_keys = ON;");
 }
 
 DB::~DB() {
