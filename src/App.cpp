@@ -1,5 +1,7 @@
 #include "doof/App.h"
 
+extern Util util;
+
 App::App() : auth(db) {
   db.createTables();
 
@@ -32,11 +34,12 @@ void App::init() {
       break;
     }
     }
+    cin.ignore(1024, '\n');
   }
 }
 
 void App::printTitle() {
-  cout << "\n     Doof     \n";
+  cout << "\nDoof\n";
 }
 
 void App::printPointer() {
@@ -65,7 +68,7 @@ void App::handleRestaurantAuth() {
   int selection;
   do {
     App::printTitle();
-    cout << "    Restaurant Auth     \n";
+    cout << "Restaurant Auth     \n";
     cout << "1. Register\n";
     cout << "2. Login\n";
     cout << "3. Exit\n";
@@ -77,14 +80,56 @@ void App::handleRestaurantAuth() {
 
 void App::handleRestaurantRegister() {
   string email;
-  cout << "Email\n";
-  App::printPointer();
-  cin >> email;
+  bool valid = true;
 
-  if (db.restaurantEmailExists(email)) {
-    cout << "bad email\n";
-  }
-  else {
-    cout << "unique email\n";
-  }
+  do {
+    cout << "***Restaurant Register***\n";
+    cout << "Email: ";
+    getline(cin, email);
+
+    if (db.restaurantEmailExists(email)) {
+      cout << "A restaurant with that email already exists.\n";
+      char selection;
+      do {
+        cout << "Would you like to go back to the previous page? (y/n): ";
+        cin >> selection;
+      } while (selection != 'y' && selection != 'n');
+
+      if (selection == 'y') {
+        screen = SCREEN_RESTAURANT_AUTH;
+        return;
+      }
+      else if (selection == 'n') {
+        valid = false;
+      }
+    }
+    else {
+      valid = true;
+    }
+  } while (!valid);
+
+  string password;
+  util.doWhile(password, "", "Password: ");
+
+  string name;
+  util.doWhile(name, "", "Restaurant Name: ");
+
+  string contact;
+  util.doWhile(contact, "", "Contact Number: ");
+
+  string address;
+  util.doWhile(address, "", "Address: ");
+
+  int type;
+  do {
+    cout << "Restaurant Type: \n";
+    cout << "1. Fast Food\n";
+    cout << "2. Cafe\n";
+    cout << "3. Fine Dining\n";
+    App::printPointer();
+    cin >> type;
+  } while (type < 1 || type > 3);
+
+  Restaurant res(name, email, password, contact, address, static_cast<RestaurantType>(type));
+  auth.registerRestaurant(res);
 }

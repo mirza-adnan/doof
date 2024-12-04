@@ -2,12 +2,15 @@
 #define AUTH_H
 
 #include "doof/enums.h"
+#include "doof/User.h"
 #include "doof/DB.h"
+#include "doof/Util.h"
+#include "doof/Restaurant.h"
 
 class Auth {
 private:
   AuthType type;
-  int userId;
+  User* user;
   DB& db;
 
 public:
@@ -21,7 +24,7 @@ public:
   void setType(const AuthType _type);
   void setId(const int _id);
 
-  void registerRestaurant();
+  void registerRestaurant(const Restaurant& restaurant);
   bool isLoggedIn();
 };
 

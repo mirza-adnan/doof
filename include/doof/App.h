@@ -7,6 +7,7 @@
 #include "doof/DB.h"
 #include "doof/Food.h"
 #include "doof/Auth.h"
+#include "doof/Util.h"
 #include "doof/enums.h"
 
 
