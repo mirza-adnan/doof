@@ -144,3 +144,28 @@ void DB::insertFood(Food& food) const {
   sqlite3_finalize(stmt);
 }
 
+bool DB::restaurantEmailExists(const string& email) const {
+  sqlite3_stmt* stmt = nullptr;
+  const char* query = "SELECT r_name FROM Restaurant WHERE r_email = ?;";
+
+  if (sqlite3_prepare_v2(db, query, -1, &stmt, nullptr) != SQLITE_OK) {
+    cerr << "Error preparing SELECT statement(Restaurant): " << sqlite3_errmsg(db) << "\n";
+    return false;
+  }
+
+  if (sqlite3_bind_text(stmt, 1, email.c_str(), -1, SQLITE_STATIC) != SQLITE_OK) {
+    cerr << "Error binding email parameter: " << sqlite3_errmsg(db) << "\n";
+    sqlite3_finalize(stmt);
+    return false;
+  }
+
+  bool exists = false;
+  if (sqlite3_step(stmt) == SQLITE_ROW) {
+    exists = true;
+  }
+
+  sqlite3_finalize(stmt);
+  return exists;
+}
+
+

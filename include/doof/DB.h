@@ -22,6 +22,7 @@ public:
   bool insertRestaurant(Restaurant& restaurant) const;
   void getRestaurants() const;
   void insertFood(Food& food) const;
+  bool restaurantEmailExists(const string& email) const;
 };
 
 #endif
