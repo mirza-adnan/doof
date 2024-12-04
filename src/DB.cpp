@@ -49,8 +49,6 @@ void DB::createTables() {
     "FOREIGN KEY(r_id) REFERENCES Restaurant(r_id),"
     "UNIQUE(f_name, r_id));"
   );
-
-  cout << "Tables created\n";
 }
 
 bool DB::insertRestaurant(Restaurant& restaurant) const {
