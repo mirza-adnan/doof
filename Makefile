@@ -1,2 +1,2 @@
 all:
-	g++ -o main ./src/*.cpp -I ./include/ -L ./lib -lsqlite3
+	g++ -o main ./src/*.cpp -I ./include/ -L ./lib -lsqlite3 -lsodium
