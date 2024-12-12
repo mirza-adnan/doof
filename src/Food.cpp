@@ -3,10 +3,9 @@
 // Default constructor
 Food::Food() {}
 
-Food::Food(const string& _name, float _price, bool _available, int _restaurantId) {
+Food::Food(const string& _name, float _price, int _restaurantId) {
   name = _name;
   price = _price;
-  available = _available;
   restaurantId = _restaurantId;
 }
 
@@ -17,10 +16,6 @@ string Food::getName() const {
 
 float Food::getPrice() const {
   return price;
-}
-
-bool Food::isAvailable() const {
-  return available;
 }
 
 int Food::getId() const {
@@ -38,10 +33,6 @@ void Food::setName(const string& _name) {
 
 void Food::setPrice(const float _price) {
   price = _price;
-}
-
-void Food::setAvailable(const bool _available) {
-  available = _available;
 }
 
 void Food::setId(int _id) {
