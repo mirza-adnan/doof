@@ -15,23 +15,23 @@ int User::getId() const {
   return id;
 }
 
-string User::getName() const {
+string& User::getName() {
   return name;
 }
 
-string User::getEmail() const {
+string& User::getEmail() {
   return email;
 }
 
-string User::getPassword() const {
+string& User::getPassword() {
   return password;
 }
 
-string User::getAddress() const {
+string& User::getAddress() {
   return address;
 }
 
-string User::getContact() const {
+string& User::getContact() {
   return contact;
 }
 

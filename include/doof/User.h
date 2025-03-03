@@ -21,11 +21,11 @@ public:
 
   // getters
   int getId() const;
-  string getName() const;
-  string getEmail() const;
-  string getPassword() const;
-  string getAddress() const;
-  string getContact() const;
+  string& getName();
+  string& getEmail();
+  string& getPassword();
+  string& getAddress();
+  string& getContact();
 
   // setters
   void setId(const int _id);

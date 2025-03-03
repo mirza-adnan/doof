@@ -21,3 +21,4 @@ RestaurantType Restaurant::getType() const {
 void Restaurant::setType(const RestaurantType& _type) {
   type = _type;
 }
+
