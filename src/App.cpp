@@ -3,12 +3,19 @@
 extern Util util;
 
 App::App() : auth(db) {
+  user = nullptr;
+  db.execute("DROP TABLE Food;");
   db.createTables();
+  db.getRestaurants();
 
   screen = SCREEN_ROLE_SELECTION;
   cout << "***************\n";
   cout << "Welcome to Doof\n";
   cout << "***************\n";
+}
+
+App::~App() {
+  delete user;
 }
 
 void App::init() {
@@ -30,16 +37,38 @@ void App::init() {
       break;
     }
 
+    case SCREEN_RESTAURANT_LOGIN: {
+      App::handleRestaurantLogin();
+      break;
+    }
+
+    case SCREEN_RESTAURANT_MAIN_MENU: {
+      App::handleRestaurantMainMenu();
+      break;
+    }
+
+    case SCREEN_RESTAURANT_ADD_ITEM: {
+      App::handleRestaurantAddItem();
+      break;
+    }
+
+    case SCREEN_RESTAURANT_DISPLAY_MENU: {
+      App::handleRestaurantDisplayMenu();
+      break;
+    }
+
     default: {
+      screen = SCREEN_EXIT;
       break;
     }
     }
     cin.ignore(1024, '\n');
+    // cout << "\x1B[2J\x1B[H";
   }
 }
 
 void App::printTitle() {
-  cout << "\nDoof\n";
+  cout << "Doof\n";
 }
 
 void App::printPointer() {
@@ -55,7 +84,7 @@ void App::handleRoleSelection() {
     cout << "1. Restaurant\n";
     cout << "2. Customer\n";
     cout << "3. Exit\n";
-    App::printPointer();
+    util.printPointer();
     cin >> selection;
   } while (selection < 1 || selection > 3);
 
@@ -81,9 +110,9 @@ void App::handleRestaurantAuth() {
 void App::handleRestaurantRegister() {
   string email;
   bool valid = true;
+  cout << "***Restaurant Register***\n";
 
   do {
-    cout << "***Restaurant Register***\n";
     cout << "Email: ";
     getline(cin, email);
 
@@ -91,7 +120,7 @@ void App::handleRestaurantRegister() {
       cout << "A restaurant with that email already exists.\n";
       char selection;
       do {
-        cout << "Would you like to go back to the previous page? (y/n): ";
+        cout << "Would you like to go back to the previous page to login instead? (y/n): ";
         cin >> selection;
       } while (selection != 'y' && selection != 'n');
 
@@ -106,7 +135,7 @@ void App::handleRestaurantRegister() {
     else {
       valid = true;
     }
-  } while (!valid);
+  } while (!valid || email == "");
 
   string password;
   util.doWhile(password, "", "Password: ");
@@ -130,6 +159,107 @@ void App::handleRestaurantRegister() {
     cin >> type;
   } while (type < 1 || type > 3);
 
-  Restaurant res(name, email, password, contact, address, static_cast<RestaurantType>(type));
-  auth.registerRestaurant(res);
+  Restaurant* res = new Restaurant(name, email, password, contact, address, static_cast<RestaurantType>(type - 1));
+  auth.registerRestaurant(*res);
+
+  user = res;
+  db.getRestaurants();
+  screen = SCREEN_RESTAURANT_MAIN_MENU;
+}
+
+void App::handleRestaurantLogin() {
+  string email;
+  bool validEmail;
+
+  cout << "***Restaurant Login***\n";
+  do {
+    cout << "Email: ";
+    getline(cin, email);
+
+    if (email == "") {
+      continue;
+    }
+
+    if (!db.restaurantEmailExists(email)) {
+      cout << "There does not seem to be a restaurant with that email.\n";
+
+      char selection;
+      do {
+        cout << "Would you like to go back to the previous page to register instead? (y/n): ";
+        cin >> selection;
+      } while (selection != 'y' && selection != 'n');
+
+      if (selection == 'y') {
+        screen = SCREEN_RESTAURANT_AUTH;
+        return;
+      }
+      else if (selection == 'n') {
+        validEmail = false;
+      }
+    }
+    else {
+      validEmail = true;
+    }
+  } while (!validEmail || email == "");
+
+  string password;
+  util.doWhile(password, "", "Password: ");
+
+  try {
+    user = auth.loginRestaurant(email, password);
+    if (!user) {
+      screen = SCREEN_RESTAURANT_AUTH;
+      throw runtime_error("");
+    }
+    else {
+      cout << "Logged in successfully\n";
+      cout << "Press Enter to continue...";
+      screen = SCREEN_RESTAURANT_MAIN_MENU;
+    }
+  }
+  catch (exception& e) {
+    cout << "Failed to fetch restaurant with that email";
+    screen = SCREEN_RESTAURANT_AUTH;
+  }
+}
+
+void App::handleRestaurantMainMenu() {
+  Screen options[] = { SCREEN_RESTAURANT_ADD_ITEM, SCREEN_RESTAURANT_DISPLAY_MENU };
+  int selection;
+
+  do {
+    cout << "\n" << user->getName();
+    cout << " Main Menu\n";
+    cout << "1. Add Item to Menu\n";
+    cout << "2. Display Menu\n";
+    cout << "3. View Orders\n";
+    cout << "4. Dispatch Current Order\n";
+
+    util.printPointer();
+    cin >> selection;
+  } while (selection < 1 || selection > 4);
+
+  screen = options[selection - 1];
+
+}
+
+void App::handleRestaurantAddItem() {
+  string name;
+  util.doWhile(name, "", "Item Name: ");
+
+  float price;
+  do {
+    cout << "Price: ";
+    cin >> price;
+  } while (price <= 0);
+
+  Food food(name, price, user->getId());
+  db.insertFood(food);
+
+  cout << "Item successfully added to the menu!\n";
+  screen = SCREEN_RESTAURANT_MAIN_MENU;
+}
+
+void App::handleRestaurantDisplayMenu() {
+  db.getMenu(user->getId());
 }

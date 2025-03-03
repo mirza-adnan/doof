@@ -19,10 +19,14 @@ public:
   sqlite3*& getDb();
   bool execute(const string& sql) const;
   void createTables();
+
   bool insertRestaurant(Restaurant& restaurant) const;
   void getRestaurants() const;
-  void insertFood(Food& food) const;
+  Restaurant* getRestaurantByEmail(const string& email) const;
   bool restaurantEmailExists(const string& email) const;
+
+  void insertFood(Food& food) const;
+  void getMenu(const int restaurantId) const;
 };
 
 #endif

@@ -10,7 +10,7 @@ Food::Food(const string& _name, float _price, int _restaurantId) {
 }
 
 // getters
-string Food::getName() const {
+const string& Food::getName() const {
   return name;
 }
 

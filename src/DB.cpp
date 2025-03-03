@@ -1,11 +1,12 @@
 #include "doof/DB.h"
 
 DB::DB() {
-  if (sqlite3_open("./db/doof.dev.db", &db) != SQLITE_OK) {
+  if (sqlite3_open("./db/doof.db", &db) != SQLITE_OK) {
     cerr << "Error opening database: " << sqlite3_errmsg(db) << "\n";
   }
 
   DB::execute("PRAGMA foreign_keys = ON;");
+  DB::execute("PRAGMA encoding = 'UTF-8';");
 }
 
 DB::~DB() {
@@ -44,7 +45,6 @@ void DB::createTables() {
     "f_id INTEGER PRIMARY KEY AUTOINCREMENT,"
     "f_name TEXT NOT NULL,"
     "f_price REAL NOT NULL,"
-    "f_available INTEGER NOT NULL CHECK (f_available in (0, 1)),"
     "r_id INTEGER NOT NULL,"
     "FOREIGN KEY(r_id) REFERENCES Restaurant(r_id),"
     "UNIQUE(f_name, r_id));"
@@ -108,16 +108,12 @@ void DB::getRestaurants() const {
     string address = (char*)sqlite3_column_text(stmt, 4);
     string contact = (char*)sqlite3_column_text(stmt, 5);
     RestaurantType type = static_cast<RestaurantType>(sqlite3_column_int(stmt, 6));
-
-    cout << id << "\n";
-    cout << name << "\n";
-    cout << email << "\n";
   }
 }
 
 void DB::insertFood(Food& food) const {
   sqlite3_stmt* stmt;
-  const char* sql = "INSERT INTO Food (f_name, f_price, f_available, r_id) VALUES (?, ?, ?, ?);";
+  const char* sql = "INSERT INTO Food (f_name, f_price, r_id) VALUES (?, ?, ?);";
 
   if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
     cerr << "Error preparing INSERT statement(Food): " << sqlite3_errmsg(db) << "\n";
@@ -127,8 +123,7 @@ void DB::insertFood(Food& food) const {
 
   sqlite3_bind_text(stmt, 1, food.getName().c_str(), -1, SQLITE_STATIC);
   sqlite3_bind_double(stmt, 2, food.getPrice());
-  sqlite3_bind_int(stmt, 3, food.isAvailable());
-  sqlite3_bind_int(stmt, 4, food.getRestaurantId());
+  sqlite3_bind_int(stmt, 3, food.getRestaurantId());
 
   if (sqlite3_step(stmt) != SQLITE_DONE) {
     cerr << "Error executing INSERT statement(Food): " << sqlite3_errmsg(db) << "\n";
@@ -138,6 +133,34 @@ void DB::insertFood(Food& food) const {
 
   const int foodId = static_cast<int>(sqlite3_last_insert_rowid(db));
   food.setId(foodId);
+
+  sqlite3_finalize(stmt);
+}
+
+void DB::getMenu(const int restaurantId) const {
+  sqlite3_stmt* stmt;
+  const char* query = "SELECT f_id, f_name, f_price, r_id FROM Food WHERE r_id = ?;";
+
+  if (sqlite3_prepare_v2(db, query, -1, &stmt, nullptr) != SQLITE_OK) {
+    cerr << "Error preparing SELECT statement(Food): " << sqlite3_errmsg(db) << "\n";
+    sqlite3_finalize(stmt);
+    return;
+  }
+
+  if (sqlite3_bind_int(stmt, 1, restaurantId) != SQLITE_OK) {
+    cerr << "Error binding email parameter: " << sqlite3_errmsg(db) << "\n";
+    sqlite3_finalize(stmt);
+    return;
+  }
+
+  while (sqlite3_step(stmt) == SQLITE_ROW) {
+    int id = sqlite3_column_int(stmt, 0);
+    string name = (char*)sqlite3_column_text(stmt, 1);
+    float price = sqlite3_column_double(stmt, 2);
+    int resId = sqlite3_column_int(stmt, 3);
+
+    printf("%d. \t %s \t %f\n", id, name.c_str(), price);
+  }
 
   sqlite3_finalize(stmt);
 }
@@ -164,6 +187,44 @@ bool DB::restaurantEmailExists(const string& email) const {
 
   sqlite3_finalize(stmt);
   return exists;
+}
+
+Restaurant* DB::getRestaurantByEmail(const string& email) const {
+  sqlite3_stmt* stmt = nullptr;
+  const char* query = "SELECT r_id, r_name, r_email, r_password, r_address, r_contact, r_type FROM Restaurant WHERE r_email = ?;";
+
+  if (sqlite3_prepare_v2(db, query, -1, &stmt, nullptr) != SQLITE_OK) {
+    cerr << "Error preparing SELECT statement(Restaurant): " << sqlite3_errmsg(db) << "\n";
+    throw runtime_error("");
+  }
+
+  if (sqlite3_bind_text(stmt, 1, email.c_str(), -1, SQLITE_STATIC) != SQLITE_OK) {
+    cerr << "Error binding email parameter: " << sqlite3_errmsg(db) << "\n";
+    sqlite3_finalize(stmt);
+    throw runtime_error("");
+  }
+
+  if (sqlite3_step(stmt) == SQLITE_ROW) {
+    int id = sqlite3_column_int(stmt, 0);
+    string name = (char*)sqlite3_column_text(stmt, 1);
+    string email = (char*)sqlite3_column_text(stmt, 2);
+    string password = (char*)sqlite3_column_text(stmt, 3);
+    string address = (char*)sqlite3_column_text(stmt, 4);
+    string contact = (char*)sqlite3_column_text(stmt, 5);
+    RestaurantType type = static_cast<RestaurantType>(sqlite3_column_int(stmt, 6));
+
+    Restaurant* res = new Restaurant(name, email, password, address, contact, type);
+    res->setId(id);
+
+    sqlite3_finalize(stmt);
+
+    return res;
+  }
+  else {
+    sqlite3_finalize(stmt);
+    throw runtime_error("");
+  }
+
 }
 
 
