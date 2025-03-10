@@ -16,6 +16,9 @@ public:
 
   Food(const string& _name, float _price, int _restaurantId);
 
+  Food(int _id, const string& _name, float _price, int _restaurantId);
+
+
   // getters
   const string& getName() const;
   float getPrice() const;

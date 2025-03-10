@@ -9,6 +9,13 @@ Food::Food(const string& _name, float _price, int _restaurantId) {
   restaurantId = _restaurantId;
 }
 
+Food::Food(int _id, const string& _name, float _price, int _restaurantId) {
+  id = _id;
+  name = _name;
+  price = _price;
+  restaurantId = _restaurantId;
+}
+
 // getters
 const string& Food::getName() const {
   return name;
