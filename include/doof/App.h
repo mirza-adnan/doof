@@ -16,7 +16,6 @@
 
 class App {
 private:
-  DB db;
   Auth auth;
   Screen screen;
   User* user;

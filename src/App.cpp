@@ -1,6 +1,7 @@
 #include "doof/App.h"
 
 extern Util util;
+extern DB db;
 
 App::App() : auth(db) {
   user = nullptr;
@@ -185,7 +186,7 @@ void App::handleRestaurantLogin() {
 
       char selection;
       do {
-        cout << "Would you like to go back to the previous page to register instead? (y/n): ";
+        cout << "Would you like to go back? (y/n): ";
         cin >> selection;
       } while (selection != 'y' && selection != 'n');
 
@@ -212,13 +213,14 @@ void App::handleRestaurantLogin() {
       throw runtime_error("");
     }
     else {
+      ((Restaurant*)user)->setMenu(db.getMenu(user->getId()));
       cout << "Logged in successfully\n";
       cout << "Press Enter to continue...";
       screen = SCREEN_RESTAURANT_MAIN_MENU;
     }
   }
   catch (exception& e) {
-    cout << "Failed to fetch restaurant with that email";
+    cout << "Failed to fetch restaurant with that email\n";
     screen = SCREEN_RESTAURANT_AUTH;
   }
 }
@@ -254,12 +256,13 @@ void App::handleRestaurantAddItem() {
   } while (price <= 0);
 
   Food food(name, price, user->getId());
-  db.insertFood(food);
+  ((Restaurant*)user)->addToMenu(food);
 
   cout << "Item successfully added to the menu!\n";
   screen = SCREEN_RESTAURANT_MAIN_MENU;
 }
 
 void App::handleRestaurantDisplayMenu() {
-  db.getMenu(user->getId());
+  ((Restaurant*)user)->displayMenu();
+  screen = SCREEN_RESTAURANT_MAIN_MENU;
 }

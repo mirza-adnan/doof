@@ -1,4 +1,5 @@
 #include "doof/DB.h"
+#include "doof/Restaurant.h"
 
 DB::DB() {
   if (sqlite3_open("./db/doof.db", &db) != SQLITE_OK) {
@@ -137,21 +138,23 @@ void DB::insertFood(Food& food) const {
   sqlite3_finalize(stmt);
 }
 
-void DB::getMenu(const int restaurantId) const {
+vector<Food> DB::getMenu(const int restaurantId) const {
   sqlite3_stmt* stmt;
   const char* query = "SELECT f_id, f_name, f_price, r_id FROM Food WHERE r_id = ?;";
 
   if (sqlite3_prepare_v2(db, query, -1, &stmt, nullptr) != SQLITE_OK) {
     cerr << "Error preparing SELECT statement(Food): " << sqlite3_errmsg(db) << "\n";
     sqlite3_finalize(stmt);
-    return;
+    return {}; // Return an empty vector
   }
 
   if (sqlite3_bind_int(stmt, 1, restaurantId) != SQLITE_OK) {
     cerr << "Error binding email parameter: " << sqlite3_errmsg(db) << "\n";
     sqlite3_finalize(stmt);
-    return;
+    return {}; // Return an empty vector
   }
+
+  vector<Food> result;
 
   while (sqlite3_step(stmt) == SQLITE_ROW) {
     int id = sqlite3_column_int(stmt, 0);
@@ -159,11 +162,14 @@ void DB::getMenu(const int restaurantId) const {
     float price = sqlite3_column_double(stmt, 2);
     int resId = sqlite3_column_int(stmt, 3);
 
-    printf("%d. \t %s \t %f\n", id, name.c_str(), price);
+    result.push_back(Food(id, name, price, resId));
   }
 
   sqlite3_finalize(stmt);
+
+  return result;
 }
+
 
 bool DB::restaurantEmailExists(const string& email) const {
   sqlite3_stmt* stmt = nullptr;
@@ -227,4 +233,4 @@ Restaurant* DB::getRestaurantByEmail(const string& email) const {
 
 }
 
-
+DB db;

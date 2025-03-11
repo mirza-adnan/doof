@@ -2,11 +2,13 @@
 #define DB_H
 
 #include <iostream>
+#include <vector>
 #include "sqlite3/sqlite3.h"
-#include "doof/Restaurant.h"
 #include "doof/Food.h"
 
 using namespace std;
+
+class Restaurant;
 
 class DB {
 private:
@@ -26,7 +28,7 @@ public:
   bool restaurantEmailExists(const string& email) const;
 
   void insertFood(Food& food) const;
-  void getMenu(const int restaurantId) const;
+  vector<Food> getMenu(const int restaurantId) const;
 };
 
 #endif
