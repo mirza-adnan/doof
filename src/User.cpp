@@ -10,6 +10,15 @@ User::User(const string& _name, const string& _email, const string& _pass, const
   address = _addr;
 }
 
+User::User(int _id, const string& _name, const string& _email, const string& _pass, const string& _contact, const string& _addr) {
+  id = _id;
+  name = _name;
+  email = _email;
+  password = _pass;
+  contact = _contact;
+  address = _addr;
+}
+
 // getters
 int User::getId() const {
   return id;

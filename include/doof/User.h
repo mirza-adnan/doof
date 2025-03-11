@@ -19,6 +19,8 @@ public:
 
   User(const string& _name, const string& _email, const string& _pass, const string& _contact, const string& _addr);
 
+  User(int id, const string& _name, const string& _email, const string& _pass, const string& _contact, const string& _addr);
+
   // getters
   int getId() const;
   string& getName();
