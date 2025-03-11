@@ -9,20 +9,21 @@ class CartItem{
     private:
         Food* food;
         int quantity;
+        
     public:
         CartItem();
 
-        CartItem(Food* f, int q);
-
         //getters
-        Food* getCartItemFood() const;
+        Food* getCartItemFood();
 
-        int getCartItemQuantity() const;
+        int getCartItemQuantity();
 
         //setters
-        void setCartItem(const Food*, const int q);
+        void setCartItem(Food* fd);
 
         void incrementQuantity();
+
+        void incrementQuantity(int inc);
 };
 
 #endif

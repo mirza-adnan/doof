@@ -9,18 +9,24 @@
 
 class Order{
     private:
+        int restaurantID;
+        int userID;
         vector<CartItem> items;
         float price;
         //OrderStatus status;
     public:
         Order();
 
+        ~Order();
+
         //getters
         vector<CartItem> getOrder() const;
 
         void addtoOrder(CartItem item);
 
-        void removefromOrder();
+        void removefromOrder(int index);
+
+        float calculateTotal();
 
         //void markAsDelivered();
 };
