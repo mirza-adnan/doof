@@ -27,12 +27,16 @@ public:
   void printPointer();
   void init();
   void handleRoleSelection();
+
   void handleRestaurantAuth();
   void handleRestaurantRegister();
   void handleRestaurantLogin();
   void handleRestaurantMainMenu();
   void handleRestaurantAddItem();
   void handleRestaurantDisplayMenu();
+
+  void handleCustomerAuth();
+  
 };
 
 #endif 

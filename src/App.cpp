@@ -3,7 +3,7 @@
 extern Util util;
 extern DB db;
 
-App::App() : auth(db) {
+App::App(){
   user = nullptr;
   db.execute("DROP TABLE Food;");
   db.createTables();
@@ -58,6 +58,11 @@ void App::init() {
       break;
     }
 
+    case SCREEN_CUSTOMER_AUTH: {
+      App::handleCustomerAuth();
+      break;
+    }
+
     default: {
       screen = SCREEN_EXIT;
       break;
@@ -105,6 +110,22 @@ void App::handleRestaurantAuth() {
     App::printPointer();
     cin >> selection;
   } while (selection < 1 || selection > 3);
+  screen = options[selection - 1];
+}
+
+void App::handleCustomerAuth() {
+  Screen options[] = { SCREEN_CUSTOMER_REGISTER, SCREEN_CUSTOMER_LOGIN, SCREEN_ROLE_SELECTION, SCREEN_EXIT };
+  int selection;
+  do {
+    util.printTitle();
+    cout << "Customer Auth\n";
+    cout << "1. Register\n";
+    cout << "2. Login\n";
+    cout << "3. Go Back\n";
+    cout << "4. Exit\n";
+    util.printPointer();
+    cin >> selection;
+  } while (selection < 1 || selection > 4);
   screen = options[selection - 1];
 }
 
