@@ -306,6 +306,68 @@ void App::handleRestaurantLogin() {
   }
 }
 
+void App::handleCustomerLogin() {
+  string email;
+  bool validEmail;
+
+
+  cout << "\n\n\n***  Customer Login  ***\n";
+  do {
+    cout << "Email: ";
+    getline(cin, email);
+
+
+    if (email == "") {
+      continue;
+    }
+
+
+    if (!db.customerEmailExists(email)) {
+      cout << "There does not seem to be a customer with that email.\n";
+
+
+      char selection;
+      do {
+        cout << "Would you like to go back? (y/n): ";
+        cin >> selection;
+      } while (selection != 'y' && selection != 'n');
+
+
+      if (selection == 'y') {
+        screen = SCREEN_CUSTOMER_AUTH;
+        return;
+      }
+      else if (selection == 'n') {
+        validEmail = false;
+      }
+    }
+    else {
+      validEmail = true;
+    }
+  } while (!validEmail || email == "");
+
+
+  string password = util.getMaskedPassword();
+
+
+  try {
+    user = auth.loginCustomer(email, password);
+    if (!user) {
+      screen = SCREEN_RESTAURANT_AUTH;
+      throw runtime_error("");
+    }
+    else {
+      cout << "Logged in successfully.\n";
+      cout << "Press Enter to continue...";
+      screen = SCREEN_CUSTOMER_MAIN_MENU;
+    }
+  }
+  catch (exception& e) {
+    cout << "Failed to fetch restaurant with that email\n";
+    screen = SCREEN_RESTAURANT_AUTH;
+  }
+}
+
 void App::handleRestaurantMainMenu() {
   Screen options[] = { SCREEN_RESTAURANT_ADD_ITEM, SCREEN_RESTAURANT_DISPLAY_MENU };
   int selection;

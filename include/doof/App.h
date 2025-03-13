@@ -37,6 +37,7 @@ public:
 
   void handleCustomerAuth();
   void handleCustomerRegister();
+  void handleCustomerLogin();
 };
 
 #endif 
