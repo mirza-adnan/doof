@@ -129,6 +129,66 @@ void App::handleCustomerAuth() {
   screen = options[selection - 1];
 }
 
+void App::handleCustomerRegister() {
+  string email;
+  bool valid = true;
+  cout << "\n\n\n***  Customer Registration  ***\n";
+
+
+  do {
+    cout << "Emaill: ";
+    getline(cin, email);
+
+
+    if (db.customerEmailExists(email)) {
+      cout << "A customer with that email already exists.\n";
+      char selection;
+      do {
+        cout << "Would you like to go back to the previous page to login instead? (y/n): ";
+        cin >> selection;
+      } while (selection != 'y' && selection != 'n');
+
+
+      if (selection == 'y') {
+        screen = SCREEN_CUSTOMER_AUTH;
+        return;
+      }
+      else if (selection == 'n') {
+        valid = false;
+      }
+    }
+    else {
+      valid = true;
+    }
+  } while (!valid || email == "");
+
+
+  string password = util.getMaskedPassword();
+
+
+  string name;
+  util.doWhile(name, "", "Name: ");
+
+
+  string contact;
+  util.doWhile(contact, "", "Contact Number: ");
+
+
+  string address;
+  util.doWhile(address, "", "Address: ");
+
+
+  Customer* customer = new Customer(name, email, password, contact, address);
+  auth.registerCustomer(*customer);
+
+
+  user = customer;
+  screen = SCREEN_CUSTOMER_MAIN_MENU;
+
+
+  cout << "Press Enter to continue...";
+}
+
 void App::handleRestaurantRegister() {
   string email;
   bool valid = true;

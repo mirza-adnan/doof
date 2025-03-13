@@ -36,7 +36,7 @@ public:
   void handleRestaurantDisplayMenu();
 
   void handleCustomerAuth();
-  
+  void handleCustomerRegister();
 };
 
 #endif 
