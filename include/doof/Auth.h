@@ -7,6 +7,7 @@
 #include "doof/Util.h"
 #include "doof/Restaurant.h"
 #include "sodium/sodium.h"
+#include "doof/Customer.h"
 
 class Auth {
 private:
@@ -29,6 +30,8 @@ public:
   void registerRestaurant(Restaurant& restaurant);
   Restaurant* loginRestaurant(const string& email, const string& password);
   bool isLoggedIn();
+
+  void registerCustomer(Customer& customer);
 };
 
 

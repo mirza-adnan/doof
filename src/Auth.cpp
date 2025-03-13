@@ -31,6 +31,12 @@ void Auth::registerRestaurant(Restaurant& restaurant) {
   type = AUTH_TYPE_RESTAURANT;
 }
 
+void Auth::registerCustomer(Customer& customer) {
+  customer.setPassword(Auth::hashPassword(customer.getPassword()));
+  db.insertCustomer(customer);
+  type = AUTH_TYPE_CUSTOMER;
+}
+
 Restaurant* Auth::loginRestaurant(const string& email, const string& password) {
   Restaurant* res = db.getRestaurantByEmail(email);
   if (Auth::verifyPassword(res->getPassword(), password)) {
