@@ -1,9 +1,13 @@
 #include "doof/Auth.h"
 
 extern Util util;
+extern DB db;
 
-Auth::Auth(DB& _db) : db(_db) {
+Auth::Auth() {
   type = AUTH_TYPE_NONE;
+  if (sodium_init() < 0) {
+    cerr << "Failed to initialize libsodium\n";
+  }
 }
 
 AuthType Auth::getType() const {

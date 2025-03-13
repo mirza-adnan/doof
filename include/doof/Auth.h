@@ -11,13 +11,12 @@
 class Auth {
 private:
   AuthType type;
-  DB& db;
 
   string hashPassword(const string& password) const;
   bool verifyPassword(const string& hashedPassword, const string& password) const;
 
 public:
-  Auth(DB& _db);
+  Auth();
 
   // getters
   AuthType getType() const;
