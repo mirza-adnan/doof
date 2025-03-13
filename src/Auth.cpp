@@ -49,6 +49,18 @@ Restaurant* Auth::loginRestaurant(const string& email, const string& password) {
   }
 }
 
+Customer* Auth::loginCustomer(const string& email, const string& password) {
+  Customer* customer = db.getCustomerByEmail(email);
+  if (Auth::verifyPassword(customer->getPassword(), password)) {
+    type = AUTH_TYPE_CUSTOMER;
+    return customer;
+  }
+  else {
+    cout << "The password you entered is not correct\n";
+    return nullptr;
+  }
+}
+
 string Auth::hashPassword(const string& password) const {
   char hashedPassword[crypto_pwhash_STRBYTES];
 
