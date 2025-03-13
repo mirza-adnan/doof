@@ -36,4 +36,14 @@ enum Screen {
   SCREEN_CUSTOMER_MAIN_MENU,
 };
 
+enum Color {
+  COLOR_DEFAULT,
+  COLOR_RED,
+  COLOR_GREEN,
+  COLOR_YELLOW,
+  COLOR_BLUE,
+  COLOR_MAGENTA,
+  COLOR_TOTAL
+};
+
 #endif
