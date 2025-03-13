@@ -1,5 +1,8 @@
 #include "doof/DB.h"
 #include "doof/Restaurant.h"
+#include "doof/Customer.h"
+
+class Customer;
 
 DB::DB() {
   if (sqlite3_open("./db/doof.db", &db) != SQLITE_OK) {
@@ -50,6 +53,16 @@ void DB::createTables() {
     "FOREIGN KEY(r_id) REFERENCES Restaurant(r_id),"
     "UNIQUE(f_name, r_id));"
   );
+
+  DB::execute(
+    "CREATE TABLE IF NOT EXISTS Customer("
+    "c_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+    "c_name TEXT NOT NULL,"
+    "c_email TEXT UNIQUE NOT NULL,"
+    "c_password TEXT NOT NULL,"
+    "c_address TEXT,"
+    "c_contact TEXT);"
+  );
 }
 
 bool DB::insertRestaurant(Restaurant& restaurant) const {
@@ -85,6 +98,44 @@ bool DB::insertRestaurant(Restaurant& restaurant) const {
   restaurant.setId(restaurant_id);
 
   cout << "Data inserted successfully! Last inserted ID: " << restaurant_id << "\n";
+
+  sqlite3_finalize(stmt);
+
+  return success;
+}
+
+bool DB::insertCustomer(Customer& customer) const {
+  bool success = true;
+
+  sqlite3_stmt* stmt;
+  const char* sql = "INSERT INTO Customer (c_name, c_email, c_password, c_address, c_contact) VALUES (?, ?, ?, ?, ?);";
+
+  if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+    cerr << "Error in preparing customer insert statement: " << sqlite3_errmsg(db) << "\n";
+    success = false;
+    sqlite3_finalize(stmt);
+
+    return success;
+  }
+
+  sqlite3_bind_text(stmt, 1, customer.getName().c_str(), -1, SQLITE_STATIC);
+  sqlite3_bind_text(stmt, 2, customer.getEmail().c_str(), -1, SQLITE_STATIC);
+  sqlite3_bind_text(stmt, 3, customer.getPassword().c_str(), -1, SQLITE_STATIC);
+  sqlite3_bind_text(stmt, 4, customer.getAddress().c_str(), -1, SQLITE_STATIC);
+  sqlite3_bind_text(stmt, 5, customer.getContact().c_str(), -1, SQLITE_STATIC);
+
+  if (sqlite3_step(stmt) != SQLITE_DONE) {
+    cerr << "Error executing customer insert statement: " << sqlite3_errmsg(db) << "\n";
+    success = false;
+    sqlite3_finalize(stmt);
+
+    return success;
+  }
+
+  const int customer_id = static_cast<int>(sqlite3_last_insert_rowid(db));
+  customer.setId(customer_id);
+
+  cout << "Customer added to DB. ID: " << customer_id << "\n";
 
   sqlite3_finalize(stmt);
 
@@ -195,6 +246,30 @@ bool DB::restaurantEmailExists(const string& email) const {
   return exists;
 }
 
+bool DB::customerEmailExists(const string& email) const {
+  sqlite3_stmt* stmt = nullptr;
+  const char* query = "SELECT c_name FROM Customer WHERE c_email = ?;";
+
+  if (sqlite3_prepare_v2(db, query, -1, &stmt, nullptr) != SQLITE_OK) {
+    cerr << "Error preparing SELECT statement(Customer): " << sqlite3_errmsg(db) << "\n";
+    return false;
+  }
+
+  if (sqlite3_bind_text(stmt, 1, email.c_str(), -1, SQLITE_STATIC) != SQLITE_OK) {
+    cerr << "Error binding email parameter: " << sqlite3_errmsg(db) << "\n";
+    sqlite3_finalize(stmt);
+    return false;
+  }
+
+  bool exists = false;
+  if (sqlite3_step(stmt) == SQLITE_ROW) {
+    exists = true;
+  }
+
+  sqlite3_finalize(stmt);
+  return exists;
+}
+
 Restaurant* DB::getRestaurantByEmail(const string& email) const {
   sqlite3_stmt* stmt = nullptr;
   const char* query = "SELECT r_id, r_name, r_email, r_password, r_address, r_contact, r_type FROM Restaurant WHERE r_email = ?;";
@@ -230,7 +305,42 @@ Restaurant* DB::getRestaurantByEmail(const string& email) const {
     sqlite3_finalize(stmt);
     throw runtime_error("");
   }
+}
 
+Customer* DB::getCustomerByEmail(const string& email) const {
+  sqlite3_stmt* stmt = nullptr;
+  const char* query = "SELECT c_id, c_name, c_email, c_password, c_address, c_contact FROM Customer WHERE c_email = ?;";
+
+  if (sqlite3_prepare_v2(db, query, -1, &stmt, nullptr) != SQLITE_OK) {
+    cerr << "Error preparing SELECT statement(Customer): " << sqlite3_errmsg(db) << "\n";
+    throw runtime_error("");
+  }
+
+  if (sqlite3_bind_text(stmt, 1, email.c_str(), -1, SQLITE_STATIC) != SQLITE_OK) {
+    cerr << "Error binding email parameter: " << sqlite3_errmsg(db) << "\n";
+    sqlite3_finalize(stmt);
+    throw runtime_error("");
+  }
+
+  if (sqlite3_step(stmt) == SQLITE_ROW) {
+    int id = sqlite3_column_int(stmt, 0);
+    string name = (char*)sqlite3_column_text(stmt, 1);
+    string email = (char*)sqlite3_column_text(stmt, 2);
+    string password = (char*)sqlite3_column_text(stmt, 3);
+    string address = (char*)sqlite3_column_text(stmt, 4);
+    string contact = (char*)sqlite3_column_text(stmt, 5);
+
+    Customer* customer = new Customer(name, email, password, address, contact);
+    customer->setId(id);
+
+    sqlite3_finalize(stmt);
+
+    return customer;
+  }
+  else {
+    sqlite3_finalize(stmt);
+    throw runtime_error("");
+  }
 }
 
 DB db;
