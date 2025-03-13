@@ -23,10 +23,7 @@ bool Auth::isLoggedIn() {
 }
 
 void Auth::registerRestaurant(Restaurant& restaurant) {
-  cout << "Password: " << restaurant.getPassword() << "\n";
-  cout << "hashed: " << util.hashPassword(restaurant.getPassword()) << "\n";
-  restaurant.setPassword(util.hashPassword(restaurant.getPassword()));
-  cout << "hashed2: " << restaurant.getPassword() << "\n";
+  restaurant.setPassword(Auth::hashPassword(restaurant.getPassword()));
   db.insertRestaurant(restaurant);
   type = AUTH_TYPE_RESTAURANT;
 }
@@ -42,6 +39,18 @@ Restaurant* Auth::loginRestaurant(const string& email, const string& password) {
   if (Auth::verifyPassword(res->getPassword(), password)) {
     type = AUTH_TYPE_RESTAURANT;
     return res;
+  }
+  else {
+    cout << "The password you entered is not correct\n";
+    return nullptr;
+  }
+}
+
+Customer* Auth::loginCustomer(const string& email, const string& password) {
+  Customer* customer = db.getCustomerByEmail(email);
+  if (Auth::verifyPassword(customer->getPassword(), password)) {
+    type = AUTH_TYPE_CUSTOMER;
+    return customer;
   }
   else {
     cout << "The password you entered is not correct\n";

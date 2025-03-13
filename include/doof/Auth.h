@@ -32,6 +32,7 @@ public:
   bool isLoggedIn();
 
   void registerCustomer(Customer& customer);
+  Customer* loginCustomer(const string& email, const string& password);
 };
 
 
