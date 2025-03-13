@@ -1,9 +1,12 @@
 #include "doof/Util.h"
 
-Util::Util() {
-  if (sodium_init() < 0) {
-    cerr << "Failed to initialize libsodium\n";
-  }
+Util::Util() : colors(vector<string>(COLOR_TOTAL)) {
+  colors[COLOR_DEFAULT] = "\033[0m";
+  colors[COLOR_RED] = "\033[38;5;160m";
+  colors[COLOR_GREEN] = "\033[38;5;64m";
+  colors[COLOR_YELLOW] = "\033[38;5;136m";
+  colors[COLOR_BLUE] = "\033[38;5;33m";
+  colors[COLOR_MAGENTA] = "\033[38;5;125m";
 }
 
 void Util::printTitle() const {
@@ -11,7 +14,7 @@ void Util::printTitle() const {
 }
 
 void Util::printPointer() const {
-  cout << "> ";
+  Util::printGreen("> ");
 }
 
 void Util::doWhile(string& str, const string& comp, const string& prompt) const {
@@ -21,20 +24,53 @@ void Util::doWhile(string& str, const string& comp, const string& prompt) const 
   } while (str == comp);
 }
 
-string Util::hashPassword(const string& password) const {
-  char hashedPassword[crypto_pwhash_STRBYTES];
-
-  if (crypto_pwhash_str(
-    hashedPassword,
-    password.c_str(),
-    password.size(),
-    crypto_pwhash_OPSLIMIT_INTERACTIVE,
-    crypto_pwhash_MEMLIMIT_INTERACTIVE
-  ) != 0) {
-    throw runtime_error("Error hashing password\n");
+string Util::getMaskedPassword() const {
+  string password;
+  char ch;
+  cout << "Password: ";
+  while ((ch = _getch()) != 13) {
+    if (ch == 8) {
+      if (!password.empty()) {
+        password.pop_back();
+        cout << "\b \b";
+      }
+    }
+    else {
+      password.push_back(ch);
+      cout << "*";
+    }
   }
+  cout << "\n";
 
-  return string(hashedPassword);
+  return password;
+}
+
+void Util::printRed(const string& str) const {
+  cout << colors[COLOR_RED] << str << colors[COLOR_DEFAULT];
+}
+
+void Util::printBlue(const string& str) const {
+  cout << colors[COLOR_BLUE] << str << colors[COLOR_DEFAULT];
+}
+
+void Util::printGreen(const string& str) const {
+  cout << colors[COLOR_GREEN] << str << colors[COLOR_DEFAULT];
+}
+
+void Util::printYellow(const string& str) const {
+  cout << colors[COLOR_YELLOW] << str << colors[COLOR_DEFAULT];
+}
+
+void Util::printMagenta(const string& str) const {
+  cout << colors[COLOR_MAGENTA] << str << colors[COLOR_DEFAULT];
+}
+
+void Util::printLine(const string& str) const {
+  cout << colors[COLOR_DEFAULT] << str;
+}
+
+void Util::printBanner() const {
+
 }
 
 Util util;
