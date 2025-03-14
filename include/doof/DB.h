@@ -25,7 +25,7 @@ public:
   void createTables();
 
   bool insertRestaurant(Restaurant& restaurant) const;
-  void getRestaurants() const;
+  vector<Restaurant> getRestaurants() const;
   Restaurant* getRestaurantByEmail(const string& email) const;
   bool restaurantEmailExists(const string& email) const;
 

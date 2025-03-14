@@ -97,7 +97,7 @@ bool DB::insertRestaurant(Restaurant& restaurant) const {
   const int restaurant_id = static_cast<int>(sqlite3_last_insert_rowid(db));
   restaurant.setId(restaurant_id);
 
-  cout << "Data inserted successfully! Last inserted ID: " << restaurant_id << "\n";
+  cout << "Restaurant inserted successfully! Last inserted ID: " << restaurant_id << "\n";
 
   sqlite3_finalize(stmt);
 
@@ -142,15 +142,17 @@ bool DB::insertCustomer(Customer& customer) const {
   return success;
 }
 
-void DB::getRestaurants() const {
+vector<Restaurant> DB::getRestaurants() const {
   sqlite3_stmt* stmt;
   const char* sql = "SELECT r_id, r_name, r_email, r_password, r_address, r_contact, r_type FROM Restaurant;";
 
   if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
     cerr << "Error preparing SELECT Restaurant statement: " << sqlite3_errmsg(db) << "\n";
     sqlite3_finalize(stmt);
-    return;
+    return {};
   }
+
+  vector<Restaurant> result;
 
   while (sqlite3_step(stmt) == SQLITE_ROW) {
     int id = sqlite3_column_int(stmt, 0);
@@ -160,7 +162,12 @@ void DB::getRestaurants() const {
     string address = (char*)sqlite3_column_text(stmt, 4);
     string contact = (char*)sqlite3_column_text(stmt, 5);
     RestaurantType type = static_cast<RestaurantType>(sqlite3_column_int(stmt, 6));
+
+    Restaurant res(id, name, email, password, contact, address, type);
+    result.push_back(res);
   }
+
+  return result;
 }
 
 void DB::insertFood(Food& food) const {
@@ -186,6 +193,8 @@ void DB::insertFood(Food& food) const {
   const int foodId = static_cast<int>(sqlite3_last_insert_rowid(db));
   food.setId(foodId);
 
+  cout << "Food inserted successfully with ID: " << foodId << "\n";
+
   sqlite3_finalize(stmt);
 }
 
@@ -196,13 +205,13 @@ vector<Food> DB::getMenu(const int restaurantId) const {
   if (sqlite3_prepare_v2(db, query, -1, &stmt, nullptr) != SQLITE_OK) {
     cerr << "Error preparing SELECT statement(Food): " << sqlite3_errmsg(db) << "\n";
     sqlite3_finalize(stmt);
-    return {}; // Return an empty vector
+    return {};
   }
 
   if (sqlite3_bind_int(stmt, 1, restaurantId) != SQLITE_OK) {
     cerr << "Error binding email parameter: " << sqlite3_errmsg(db) << "\n";
     sqlite3_finalize(stmt);
-    return {}; // Return an empty vector
+    return {};
   }
 
   vector<Food> result;
@@ -212,6 +221,7 @@ vector<Food> DB::getMenu(const int restaurantId) const {
     string name = (char*)sqlite3_column_text(stmt, 1);
     float price = sqlite3_column_double(stmt, 2);
     int resId = sqlite3_column_int(stmt, 3);
+
 
     result.push_back(Food(id, name, price, resId));
   }
