@@ -181,7 +181,13 @@ void App::handleCustomerRegister() {
   util.doWhile(name, "", "Name: ");
 
   string contact;
-  util.doWhile(contact, "", "Contact Number: ");
+  while (true) {
+    util.doWhile(contact, "", "Contact Number: ");
+    if (contact.size() != 11) {
+      util.printRed("Contact number must be 11 digits.");
+    }
+    else break;
+  }
 
   string address;
   util.doWhile(address, "", "Address: ");
@@ -230,7 +236,13 @@ void App::handleRestaurantRegister() {
   util.doWhile(name, "", "Restaurant Name: ");
 
   string contact;
-  util.doWhile(contact, "", "Contact Number: ");
+  while (true) {
+    util.doWhile(contact, "", "Contact Number: ");
+    if (contact.size() != 11) {
+      util.printRed("Contact number must be 11 digits.");
+    }
+    else break;
+  }
 
   string address;
   util.doWhile(address, "", "Address: ");
