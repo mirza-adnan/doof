@@ -38,6 +38,7 @@ public:
   void handleCustomerAuth();
   void handleCustomerRegister();
   void handleCustomerLogin();
+  void handleCustomerMainMenu();
 };
 
 #endif 

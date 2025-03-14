@@ -73,6 +73,11 @@ void App::init() {
       break;
     }
 
+    case SCREEN_CUSTOMER_MAIN_MENU: {
+      App::handleCustomerMainMenu();
+      break;
+    }
+
     default: {
       screen = SCREEN_EXIT;
       break;
@@ -396,6 +401,28 @@ void App::handleRestaurantMainMenu() {
 
   screen = options[selection - 1];
 
+}
+
+void App::handleCustomerMainMenu() {
+  Screen options[] = { SCREEN_CUSTOMER_EXPLORE_RESTAURANTS, SCREEN_CUSTOMER_CART, SCREEN_CUSTOMER_CURRENT_ORDER, SCREEN_ROLE_SELECTION };
+  int selection;
+
+
+  do {
+    string hello = "Welcome to Doof, " + user->getName() + ". How can we help you today?\n";
+    util.printBlue(hello);
+    cout << "1. Explore Restaurants\n";
+    cout << "2. View Cart\n";
+    cout << "3. Current Order\n";
+    cout << "4. Logout\n";
+
+
+    util.printPointer();
+    cin >> selection;
+  } while (selection < 1 || selection > 4);
+
+
+  screen = options[selection - 1];
 }
 
 void App::handleRestaurantAddItem() {
