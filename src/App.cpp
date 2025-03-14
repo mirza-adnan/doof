@@ -494,41 +494,42 @@ void App::handleExploreRestaurants() {
   }
 }
 
-void App::handleExploreRestaurants() {
-  vector<Restaurant> restaurants = db.getRestaurants();
-  int count = 1;
-  util.printBlue("\nExplore your favorites!\n");
-  for (Restaurant& res : restaurants) {
-    string line = to_string(count) + ". " + res.getName() + "\n";
-    util.printGreen(line);
-    cout << "      " << "(" << res.getType() << ")\n";
-    count++;
-  }
+void App::handleSelectedRestaurant() {
+  cout << "\n";
+  vector<Food> menu = ((Customer*)user)->getSelectedRestaurant().getMenu();
+  string line = ((Customer*)user)->getSelectedRestaurant().getName() + " Menu\n";
+  cout << "Menu size: " << menu.size() << "\n";
+  util.printBlue(line);
 
+  for (int i = 0; i < menu.size(); i++) {
+    Food& item = menu[i];
+    util.printLine(string(to_string(i + 1)) + string(". "));
+    util.printGreen(item.getName());
+    util.printLine(string("    ") + string(to_string(item.getPrice())) + string(" BDT\n"));
+  }
 
   cout << "\n";
 
-
   int selection;
   do {
-    util.printLine("1. Select Restaurant\n");
-    util.printLine("2. Back\n");
+    cout << "1. Select Item\n";
+    cout << "2. Confirm\n";
+    cout << "3. Back\n";
     util.printPointer();
     cin >> selection;
-  } while (selection < 1 || selection > 2);
+  } while (selection < 1 || selection > 3);
 
   if (selection == 1) {
     do {
-      util.printYellow("Restaurant Index: ");
+      util.printYellow("Item Index: ");
       cin >> selection;
-    } while (selection < 1 || selection > restaurants.size());
+    } while (selection < 1 || selection > menu.size());
 
-    Restaurant* selected = new Restaurant(restaurants[selection - 1]);
+    do {
+      util.printYellow("Quantity: ");
+      cin >> selection;
+    } while (selection < 1);
+  }
 
-    ((Customer*)user)->setSelectedRestaurant(selected);
-    screen = SCREEN_CUSTOMER_SELECTED_RESTAURANT;
-  }
-  else if (selection == 2) {
-    screen = SCREEN_CUSTOMER_MAIN_MENU;
-  }
+  screen = SCREEN_CUSTOMER_MAIN_MENU;
 }
