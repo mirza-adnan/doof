@@ -12,12 +12,15 @@ Restaurant::Restaurant(int _id, const string& _name, const string& _email, const
   type = _type;
 }
 
+Restaurant::~Restaurant() {}
+
 // getters
 RestaurantType Restaurant::getType() const {
   return type;
 }
 
-const vector<Food>& Restaurant::getMenu() const {
+const vector<Food>& Restaurant::getMenu() {
+  Restaurant::setMenu(db.getMenu(Restaurant::getId()));
   return menu;
 }
 
@@ -38,7 +41,7 @@ void Restaurant::addToMenu(Food item) {
 
 void Restaurant::displayMenu() {
   for (int i = 0; i < menu.size(); i++) {
-    printf("%d. \t %s \t %f\n", i + 1, menu[i].getName().c_str(), menu[i].getPrice());
+    printf("%d. \t %s \t %.2f BDT\n", i + 1, menu[i].getName().c_str(), menu[i].getPrice());
   }
 }
 

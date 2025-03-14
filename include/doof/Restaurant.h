@@ -27,7 +27,7 @@ public:
 
   // getters
   RestaurantType getType() const;
-  const vector<Food>& getMenu() const;
+  const vector<Food>& getMenu();
 
   // setters
   void setType(const RestaurantType& _type);
