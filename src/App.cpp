@@ -3,7 +3,7 @@
 extern Util util;
 extern DB db;
 
-App::App(){
+App::App() {
   user = nullptr;
   db.execute("DROP TABLE Food;");
   db.createTables();
@@ -75,6 +75,11 @@ void App::init() {
 
     case SCREEN_CUSTOMER_MAIN_MENU: {
       App::handleCustomerMainMenu();
+      break;
+    }
+
+    case SCREEN_CUSTOMER_EXPLORE_RESTAURANTS: {
+      App::handleExploreRestaurants();
       break;
     }
 
@@ -445,4 +450,41 @@ void App::handleRestaurantAddItem() {
 void App::handleRestaurantDisplayMenu() {
   ((Restaurant*)user)->displayMenu();
   screen = SCREEN_RESTAURANT_MAIN_MENU;
+}
+
+void App::handleExploreRestaurants() {
+  vector<Restaurant> restaurants = db.getRestaurants();
+  int count = 1;
+  util.printBlue("\nExplore your favorites!\n");
+  for (Restaurant& res : restaurants) {
+    string line = to_string(count) + ". " + res.getName() + "\n";
+    util.printGreen(line);
+    cout << "      " << "(" << res.getType() << ")\n";
+    count++;
+  }
+
+  cout << "\n";
+
+  int selection;
+  do {
+    util.printLine("1. Select Restaurant\n");
+    util.printLine("2. Back\n");
+    util.printPointer();
+    cin >> selection;
+  } while (selection < 1 || selection > 2);
+
+  if (selection == 1) {
+    do {
+      util.printYellow("Restaurant Index: ");
+      cin >> selection;
+    } while (selection < 1 || selection > restaurants.size());
+
+    Restaurant* selected = new Restaurant(restaurants[selection - 1]);
+
+    ((Customer*)user)->setSelectedRestaurant(selected);
+    screen = SCREEN_CUSTOMER_SELECTED_RESTAURANT;
+  }
+  else if (selection == 2) {
+    screen = SCREEN_CUSTOMER_MAIN_MENU;
+  }
 }

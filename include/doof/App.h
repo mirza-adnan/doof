@@ -39,6 +39,7 @@ public:
   void handleCustomerRegister();
   void handleCustomerLogin();
   void handleCustomerMainMenu();
+  void handleExploreRestaurants();
 };
 
 #endif 
