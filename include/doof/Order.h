@@ -6,6 +6,7 @@
 #include "doof/Cartitem.h"
 #include "doof/Customer.h"
 #include "doof/Restaurant.h"
+#include "doof/enums.h"
 
 class Order{
     private:
@@ -13,9 +14,11 @@ class Order{
         int userID;
         vector<CartItem> items;
         float price;
-        //OrderStatus status;
+        OrderStatus status;
     public:
         Order();
+
+        Order(vector<CartItem> items, int restaurantID, int userID);
 
         ~Order();
 
@@ -26,9 +29,9 @@ class Order{
 
         void removefromOrder(int index);
 
-        float calculateTotal();
+        float getTotal();
 
-        //void markAsDelivered();
+        void markAsDelivered();
 };
 
 #endif
