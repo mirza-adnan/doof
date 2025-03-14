@@ -1,6 +1,7 @@
 #ifndef CUSTOMER_H
 #define CUSTOMER_H
 
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -9,20 +10,26 @@
 #include "doof/Order.h"
 using namespace std;
 
+
+class Restaurant;
+
+
 class Customer : public User {
 private:
-    Order currentorder;
-    vector<Order> orderHistory;
+  Order currentorder;
+  vector<Order> orderHistory;
+  Restaurant* selectedRestaurant;
 
 
 public:
-    Customer();
+  Customer();
+  Customer(const string& _name, const string& _email, const string& _pass, const string& _contact, const string& _addr);
+  ~Customer();
 
-    Customer(const string& _name, const string& _email, const string& _pass, const string& _contact, const string& _addr);
+  void addtoHistory();
 
-    ~Customer();
-
-    void addtoHistory();
+  Restaurant& getSelectedRestaurant();
+  void setSelectedRestaurant(Restaurant* res);
 };
 
 #endif
