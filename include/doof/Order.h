@@ -4,34 +4,32 @@
 #include <iostream>
 #include "doof/Food.h"
 #include "doof/Cartitem.h"
-#include "doof/Customer.h"
-#include "doof/Restaurant.h"
-#include "doof/enums.h"
+#include <vector>
+using namespace std;
 
-class Order{
-    private:
-        int restaurantID;
-        int userID;
-        vector<CartItem> items;
-        float price;
-        OrderStatus status;
-    public:
-        Order();
 
-        Order(vector<CartItem> items, int restaurantID, int userID);
+class Order {
+private:
+  int restaurantID;
+  int userID;
+  vector<CartItem> items;
+  float price;
+  //OrderStatus status;
+public:
+  Order();
 
-        ~Order();
+  ~Order();
 
-        //getters
-        vector<CartItem> getOrder() const;
+  //getters
+  vector<CartItem> getOrder() const;
 
-        void addtoOrder(CartItem item);
+  void addtoOrder(CartItem item);
 
-        void removefromOrder(int index);
+  void removefromOrder(int index);
 
-        float getTotal();
+  float calculateTotal();
 
-        void markAsDelivered();
+  //void markAsDelivered();
 };
 
 #endif
