@@ -2,17 +2,6 @@
 
 Order::Order(){}
 
-Order::Order(vector<CartItem> items, int restaurantID, int userID){
-    this->items = items;
-    this->restaurantID = restaurantID;
-    this->userID = userID;
-    this->price = 0;
-    for(auto itr: items){
-        this->price += itr.getCartItemFood()->getPrice();
-    }
-    status = ORDER_STATUS_PENDING;
-}
-
 Order::~Order(){
     items.clear();
 }
@@ -29,8 +18,20 @@ void Order::removefromOrder(int index){
     items.erase(items.begin()+index-1);
 }
 
-float Order::getTotal(){
+float Order::calculateTotal(){
+    float price = 0;
+    for(int i=0; i<items.size(); i++){
+        price += items[i].getCartItemFood()->getPrice() * items[i].getCartItemQuantity();
+    }
     return price;
+}
+
+void Order::markAsPending(){
+    status = ORDER_STATUS_PENDING;
+}
+
+void Order::markAsProcessing(){
+    status = ORDER_STATUS_PROCESSING;
 }
 
 void Order::markAsDelivered(){

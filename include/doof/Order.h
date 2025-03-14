@@ -5,6 +5,7 @@
 #include "doof/Food.h"
 #include "doof/Cartitem.h"
 #include <vector>
+#include "doof/enums.h"
 using namespace std;
 
 
@@ -13,8 +14,7 @@ private:
   int restaurantID;
   int userID;
   vector<CartItem> items;
-  float price;
-  //OrderStatus status;
+  OrderStatus status;
 public:
   Order();
 
@@ -29,7 +29,11 @@ public:
 
   float calculateTotal();
 
-  //void markAsDelivered();
+  void markAsPending();
+
+  void markAsProcessing();
+
+  void markAsDelivered();
 };
 
 #endif
