@@ -5,25 +5,28 @@
 #include "doof/Food.h"
 using namespace std;
 
-class CartItem{
-    private:
-        Food* food;
-        int quantity;
-        
-    public:
-        CartItem();
+class CartItem {
+private:
+  Food* food;
+  int quantity;
 
-        //getters
-        Food* getCartItemFood();
+public:
+  CartItem();
 
-        int getCartItemQuantity();
+  //getters
+  Food* getCartItemFood();
+  int getQuantity();
 
-        //setters
-        void setCartItem(Food* fd);
+  int getCartItemQuantity();
 
-        void incrementQuantity();
+  //setters
+  void setCartItem(Food* fd);
+  void setQuantity(int _q);
 
-        void incrementQuantity(int inc);
+
+  void incrementQuantity();
+
+  void incrementQuantity(int inc);
 };
 
 #endif

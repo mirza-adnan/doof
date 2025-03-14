@@ -11,6 +11,7 @@
 #include "doof/Util.h"
 #include "doof/enums.h"
 #include "sodium/sodium.h"
+#include "doof/Cartitem.h"
 #include <conio.h>
 
 

@@ -27,7 +27,7 @@ void Util::doWhile(string& str, const string& comp, const string& prompt) const 
 string Util::getMaskedPassword() const {
   string password;
   char ch;
-  util.printYellow("Password: ");
+  Util::printYellow("Password: ");
   while ((ch = _getch()) != 13) {
     if (ch == 8) {
       if (!password.empty()) {

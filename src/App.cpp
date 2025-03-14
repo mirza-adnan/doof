@@ -9,7 +9,6 @@ App::App() {
   db.getRestaurants();
 
   screen = SCREEN_ROLE_SELECTION;
-  util.printBlue("===== WELCOME TO DOOF =====\n");
 }
 
 App::~App() {
@@ -96,6 +95,8 @@ void App::init() {
 }
 
 void App::handleRoleSelection() {
+  util.clearConsole();
+  util.printBlue("===== WELCOME TO DOOF =====\n");
   delete user;
   user = nullptr;
 
@@ -328,7 +329,7 @@ void App::handleCustomerLogin() {
 
   util.printBlue("Customer Login\n");
   do {
-    cout << "Email: ";
+    util.printYellow("Email: ");
     getline(cin, email);
 
     if (email == "") {
@@ -476,10 +477,10 @@ void App::handleExploreRestaurants() {
 }
 
 void App::handleSelectedRestaurant() {
+  ((Customer*)user)->clearCart();
   cout << "\n";
   vector<Food> menu = ((Customer*)user)->getSelectedRestaurant().getMenu();
   string line = ((Customer*)user)->getSelectedRestaurant().getName() + " Menu\n";
-  cout << "Menu size: " << menu.size() << "\n";
   util.printBlue(line);
 
   for (int i = 0; i < menu.size(); i++) {
@@ -491,26 +492,47 @@ void App::handleSelectedRestaurant() {
 
   cout << "\n";
 
-  int selection;
-  do {
-    cout << "1. Select Item\n";
-    cout << "2. Confirm\n";
-    cout << "3. Back\n";
-    util.printPointer();
-    cin >> selection;
-  } while (selection < 1 || selection > 3);
-
-  if (selection == 1) {
+  int selection = 0;
+  while (selection != 4) {
+    selection = 0;
     do {
-      util.printYellow("Item Index: ");
+      cout << "1. Select Item\n";
+      cout << "2. Show Cart\n";
+      cout << "3. Confirm\n";
+      cout << "4. Back\n";
+      util.printPointer();
       cin >> selection;
-    } while (selection < 1 || selection > menu.size());
+    } while (selection < 1 || selection > 4);
 
-    do {
-      util.printYellow("Quantity: ");
-      cin >> selection;
-    } while (selection < 1);
+    if (selection == 1) {
+      CartItem item;
+      int choice;
+      do {
+        util.printYellow("Item Index: ");
+        cin >> choice;
+      } while (choice < 1 || choice > menu.size());
+
+      item.setCartItem(&menu[choice - 1]);
+
+
+      do {
+        util.printYellow("Quantity: ");
+        cin >> choice;
+      } while (choice < 1);
+
+      item.setQuantity(choice);
+      ((Customer*)user)->addToCart(item);
+    }
+    else if (selection == 2) {
+      ((Customer*)user)->displayCart();
+    }
+    else if (selection == 3) {
+
+    }
+    else if (selection == 4) {
+      ((Customer*)user)->clearCart();
+      screen = SCREEN_CUSTOMER_EXPLORE_RESTAURANTS;
+    }
   }
 
-  screen = SCREEN_CUSTOMER_MAIN_MENU;
 }

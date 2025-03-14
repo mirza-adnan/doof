@@ -8,6 +8,7 @@
 #include "doof/Food.h"
 #include "doof/User.h"
 #include "doof/Order.h"
+#include "doof/Util.h"
 using namespace std;
 
 
@@ -19,6 +20,7 @@ private:
   Order currentorder;
   vector<Order> orderHistory;
   Restaurant* selectedRestaurant;
+  vector<CartItem> cart;
 
 
 public:
@@ -30,6 +32,11 @@ public:
 
   Restaurant& getSelectedRestaurant();
   void setSelectedRestaurant(Restaurant* res);
+
+  const vector<CartItem>& getCart() const;
+  void addToCart(CartItem item);
+  void clearCart();
+  void displayCart();
 };
 
 #endif
