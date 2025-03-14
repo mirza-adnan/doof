@@ -68,6 +68,11 @@ void App::init() {
       break;
     }
 
+    case SCREEN_CUSTOMER_LOGIN: {
+      App::handleCustomerLogin();
+      break;
+    }
+
     default: {
       screen = SCREEN_EXIT;
       break;
