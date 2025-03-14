@@ -91,6 +91,7 @@ void App::init() {
     }
     }
     cin.ignore(1024, '\n');
+    util.clearConsole();
   }
 }
 
@@ -148,25 +149,25 @@ void App::handleCustomerAuth() {
 void App::handleCustomerRegister() {
   string email;
   bool valid = true;
-  cout << "\n\n\n***  Customer Registration  ***\n";
+  util.printBlue("Customer Registration\n");
 
   do {
-    cout << "Emaill: ";
+    util.printYellow("Emaill: ");
     getline(cin, email);
 
     if (db.customerEmailExists(email)) {
       cout << "A customer with that email already exists.\n";
-      char selection;
+      string selection;
       do {
         cout << "Would you like to go back to the previous page to login instead? (y/n): ";
-        cin >> selection;
-      } while (selection != 'y' && selection != 'n');
+        getline(cin, selection);
+      } while (selection != "y" && selection != "n");
 
-      if (selection == 'y') {
+      if (selection == "y") {
         screen = SCREEN_CUSTOMER_AUTH;
         return;
       }
-      else if (selection == 'n') {
+      else if (selection == "n") {
         valid = false;
       }
     }
@@ -313,7 +314,7 @@ void App::handleCustomerLogin() {
   string email;
   bool validEmail;
 
-  cout << "\n\n\n***  Customer Login  ***\n";
+  util.printBlue("Customer Login\n");
   do {
     cout << "Email: ";
     getline(cin, email);

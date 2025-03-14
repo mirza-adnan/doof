@@ -19,7 +19,7 @@ void Util::printPointer() const {
 
 void Util::doWhile(string& str, const string& comp, const string& prompt) const {
   do {
-    cout << prompt;
+    Util::printYellow(prompt);
     getline(cin, str);
   } while (str == comp);
 }
@@ -27,7 +27,7 @@ void Util::doWhile(string& str, const string& comp, const string& prompt) const 
 string Util::getMaskedPassword() const {
   string password;
   char ch;
-  cout << "Password: ";
+  util.printYellow("Password: ");
   while ((ch = _getch()) != 13) {
     if (ch == 8) {
       if (!password.empty()) {
@@ -71,6 +71,10 @@ void Util::printLine(const string& str) const {
 
 void Util::printBanner() const {
 
+}
+
+void Util::clearConsole() const {
+  system("clear");
 }
 
 Util util;

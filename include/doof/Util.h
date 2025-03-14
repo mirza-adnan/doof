@@ -2,12 +2,12 @@
 #define UTIL_H
 
 #include <iostream>
-#include "sodium/sodium.h"
-#include <conio.h>
-#include <vector>
-#include "doof/enums.h"
 #include <string>
-using namespace std;
+#include <vector>
+#include "sodium/sodium.h"
+#include <cstdlib>
+#include <conio.h>
+#include "doof/enums.h"
 
 class Util {
 private:
@@ -26,6 +26,7 @@ public:
   void printMagenta(const string& str) const;
   void printLine(const string& str) const;
   void printBanner() const;
+  void clearConsole() const;
 };
 
 #endif
