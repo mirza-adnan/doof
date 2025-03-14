@@ -40,6 +40,7 @@ public:
   void handleCustomerLogin();
   void handleCustomerMainMenu();
   void handleExploreRestaurants();
+  void handleSelectedRestaurant();
 };
 
 #endif 
