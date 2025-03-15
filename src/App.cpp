@@ -120,7 +120,7 @@ void App::handleRestaurantAuth() {
   int selection;
   do {
     util.printTitle();
-    cout << "Restaurant Auth     \n";
+    util.printBlue("Restaurant Auth\n");
     cout << "1. Register\n";
     cout << "2. Login\n";
     cout << "3. Go Back\n";
@@ -135,8 +135,7 @@ void App::handleCustomerAuth() {
   Screen options[] = { SCREEN_CUSTOMER_REGISTER, SCREEN_CUSTOMER_LOGIN, SCREEN_ROLE_SELECTION, SCREEN_EXIT };
   int selection;
   do {
-    util.printTitle();
-    cout << "Customer Auth\n";
+    util.printBlue("Customer Authentication\n");
     cout << "1. Register\n";
     cout << "2. Login\n";
     cout << "3. Go Back\n";
@@ -483,17 +482,17 @@ void App::handleSelectedRestaurant() {
   string line = ((Customer*)user)->getSelectedRestaurant().getName() + " Menu\n";
   util.printBlue(line);
 
-  for (int i = 0; i < menu.size(); i++) {
-    Food& item = menu[i];
-    util.printLine(string(to_string(i + 1)) + string(". "));
-    util.printGreen(item.getName());
-    util.printLine(string("    ") + string(to_string(item.getPrice())) + string(" BDT\n"));
-  }
-
-  cout << "\n";
-
   int selection = 0;
   while (selection != 4) {
+
+    for (int i = 0; i < menu.size(); i++) {
+      Food& item = menu[i];
+      util.printLine(string(to_string(i + 1)) + string(". "));
+      util.printMagenta(item.getName());
+      util.printLine(string("    ") + string(to_string(item.getPrice())) + string(" BDT\n"));
+    }
+    cout << "\n";
+
     selection = 0;
     do {
       cout << "1. Select Item\n";
@@ -522,6 +521,9 @@ void App::handleSelectedRestaurant() {
 
       item.setQuantity(choice);
       ((Customer*)user)->addToCart(item);
+      util.clearConsole();
+      string out = item.getCartItemFood()->getName() + " added.\n\n";
+      util.printGreen(out);
     }
     else if (selection == 2) {
       ((Customer*)user)->displayCart();
