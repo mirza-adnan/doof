@@ -10,7 +10,7 @@ Util::Util() : colors(vector<string>(COLOR_TOTAL)) {
 }
 
 void Util::printTitle() const {
-  cout << "\nDoof\n";
+  cout << "Doof\n";
 }
 
 void Util::printPointer() const {
