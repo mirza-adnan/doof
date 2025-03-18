@@ -84,6 +84,11 @@ void App::init() {
       break;
     }
 
+    case SCREEN_CUSTOMER_CART: {
+      App::handleCustomerCart();
+      break;
+    }
+
     default: {
       screen = SCREEN_EXIT;
       break;
@@ -152,7 +157,7 @@ void App::handleCustomerRegister() {
   util.printBlue("Customer Registration\n");
 
   do {
-    util.printYellow("Emaill: ");
+    util.printYellow("Email: ");
     getline(cin, email);
 
     if (db.customerEmailExists(email)) {
@@ -401,6 +406,8 @@ void App::handleCustomerMainMenu() {
   Screen options[] = { SCREEN_CUSTOMER_EXPLORE_RESTAURANTS, SCREEN_CUSTOMER_CART, SCREEN_CUSTOMER_CURRENT_ORDER, SCREEN_ROLE_SELECTION };
   int selection;
 
+  cout << "HERE\n";
+
   do {
     string hello = "Welcome to Doof, " + user->getName() + ". How can we help you today?\n";
     util.printBlue(hello);
@@ -483,58 +490,103 @@ void App::handleSelectedRestaurant() {
   util.printBlue(line);
 
   int selection = 0;
-  while (selection != 4) {
 
-    for (int i = 0; i < menu.size(); i++) {
-      Food& item = menu[i];
-      util.printLine(string(to_string(i + 1)) + string(". "));
-      util.printMagenta(item.getName());
-      util.printLine(string("    ") + string(to_string(item.getPrice())) + string(" BDT\n"));
-    }
-    cout << "\n";
+  for (int i = 0; i < menu.size(); i++) {
+    Food& item = menu[i];
+    util.printLine(string(to_string(i + 1)) + string(". "));
+    util.printMagenta(item.getName());
+    util.printLine(string("    ") + string(to_string(item.getPrice())) + string(" BDT\n"));
+  }
+  cout << "\n";
 
-    selection = 0;
+  do {
+    util.printOptions({ "Select Item", "Show Cart", "Back", "Exit" });
+    util.printPointer();
+    cin >> selection;
+  } while (selection < 1 || selection > 4);
+
+  if (selection == 1) {
+    CartItem item;
+    int choice;
     do {
-      cout << "1. Select Item\n";
-      cout << "2. Show Cart\n";
-      cout << "3. Confirm\n";
-      cout << "4. Back\n";
-      util.printPointer();
-      cin >> selection;
-    } while (selection < 1 || selection > 4);
+      util.printYellow("Item Index: ");
+      cin >> choice;
+    } while (choice < 1 || choice > menu.size());
 
-    if (selection == 1) {
-      CartItem item;
-      int choice;
-      do {
-        util.printYellow("Item Index: ");
-        cin >> choice;
-      } while (choice < 1 || choice > menu.size());
-
-      item.setCartItem(&menu[choice - 1]);
+    item.setCartItem(&menu[choice - 1]);
 
 
-      do {
-        util.printYellow("Quantity: ");
-        cin >> choice;
-      } while (choice < 1);
+    do {
+      util.printYellow("Quantity: ");
+      cin >> choice;
+    } while (choice < 1);
 
-      item.setQuantity(choice);
-      ((Customer*)user)->addToCart(item);
-      util.clearConsole();
-      string out = item.getCartItemFood()->getName() + " added.\n\n";
-      util.printGreen(out);
-    }
-    else if (selection == 2) {
-      ((Customer*)user)->displayCart();
-    }
-    else if (selection == 3) {
-
-    }
-    else if (selection == 4) {
-      ((Customer*)user)->clearCart();
-      screen = SCREEN_CUSTOMER_EXPLORE_RESTAURANTS;
-    }
+    item.setQuantity(choice);
+    ((Customer*)user)->addToCart(item);
+    util.clearConsole();
+    string out = item.getCartItemFood()->getName() + " added.\n\n";
+    util.printGreen(out);
+  }
+  else if (selection == 2) {
+    screen = SCREEN_CUSTOMER_CART;
+  }
+  else if (selection == 3) {
+    ((Customer*)user)->clearCart();
+    screen = SCREEN_CUSTOMER_EXPLORE_RESTAURANTS;
+  }
+  else if (selection == 4) {
+    screen = SCREEN_EXIT;
   }
 
+}
+
+void App::handleCustomerCart() {
+  if (((Customer*)user)->isCartEmpty()) {
+    util.printRed("Your cart is empty.\n");
+    util.printYellow("Press Enter to return to Customer dashboard...");
+    util.pressEnter();
+    screen = SCREEN_CUSTOMER_MAIN_MENU;
+    return;
+  }
+
+  string header = ((Customer*)user)->getName() + "'s Cart\n";
+  util.printBlue(header);
+
+  int selection;
+  do {
+    ((Customer*)user)->displayCart();
+    util.printOptions({ "Place Order", "Clear Cart", "Go Back", "Exit" });
+    util.printPointer();
+    cin >> selection;
+  } while (selection < 1 || selection > 4);
+
+  if (selection == 1) {
+    Order* order = new Order;
+    order->setCustomerId(user->getId());
+    order->setRestaurantId(((Customer*)user)->getSelectedRestaurant().getId());
+    order->setItems(((Customer*)user)->getCart());
+    order->markAsPending();
+
+    ((Customer*)user)->setCurrentOrder(order);
+
+    util.printGreen("Got your order! It'll be at your doorstep in no time.\n");
+    util.printYellow("Press Enter to return to Customer dashboard...");
+    scanf("%c");
+    ((Customer*)user)->setSelectedRestaurant(nullptr);
+    screen = SCREEN_CUSTOMER_MAIN_MENU;
+  }
+  else if (selection == 2) {
+    ((Customer*)user)->clearCart();
+    util.printGreen("Cart Cleared.\n");
+    util.printYellow("Press Enter to return to Customer dashboard...");
+    scanf("%c");
+    ((Customer*)user)->setSelectedRestaurant(nullptr);
+    screen = SCREEN_CUSTOMER_MAIN_MENU;
+  }
+  else if (selection == 3) {
+    screen = SCREEN_CUSTOMER_SELECTED_RESTAURANT;
+  }
+  else if (selection == 4) {
+    screen = SCREEN_EXIT;
+  }
 }
