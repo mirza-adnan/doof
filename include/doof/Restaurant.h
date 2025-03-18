@@ -8,6 +8,9 @@
 #include "doof/Food.h"
 #include "doof/User.h"
 #include "doof/DB.h"
+#include <queue>
+#include <iomanip>
+#include "doof/Order.h"
 
 using namespace std;
 
@@ -15,6 +18,7 @@ class Restaurant : public User {
 private:
   RestaurantType type;
   vector<Food> menu;
+  vector<Order> orders;
 
 public:
   Restaurant();
@@ -33,6 +37,10 @@ public:
   void setType(const RestaurantType& _type);
   void setMenu(vector<Food> _menu);
   void addToMenu(Food item);
+
+  const vector<Order> getOrders();
+  void addOrder(Order order);
+  void displayOrders();
 
   void displayMenu();
 };

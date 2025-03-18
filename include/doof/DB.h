@@ -34,7 +34,11 @@ public:
   Customer* getCustomerByEmail(const string& email) const;
 
   void insertFood(Food& food) const;
+  Food getFoodById(int foodId);
   vector<Food> getMenu(const int restaurantId) const;
-};
 
+  bool insertOrder(Order& order);
+  vector<Order> getOrdersByCustomerId(int customerId);
+  vector<Order> getOrdersByRestaurantId(int customerId);
+};
 #endif

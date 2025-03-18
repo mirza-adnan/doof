@@ -11,7 +11,6 @@ Customer::Customer(const string& _name, const string& _email, const string& _pas
 
 Customer::~Customer() {
   delete selectedRestaurant;
-  delete currentorder;
 }
 
 void Customer::addtoHistory() {
@@ -41,9 +40,9 @@ void Customer::clearCart() {
 void Customer::displayCart() {
   for (int i = 0; i < cart.size(); i++) {
     CartItem& item = cart[i];
-    float price = item.getCartItemFood()->getPrice() * item.getQuantity();
+    float price = item.getCartItemFood().getPrice() * item.getQuantity();
     util.printLine(string(to_string(i + 1)) + string(". "));
-    util.printGreen(item.getCartItemFood()->getName());
+    util.printGreen(item.getCartItemFood().getName());
     util.printLine(string("  -----  ") + to_string(price) + string(" BDT\n"));
   }
 

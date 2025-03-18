@@ -35,6 +35,7 @@ public:
   void handleRestaurantMainMenu();
   void handleRestaurantAddItem();
   void handleRestaurantDisplayMenu();
+  void handleRestaurantViewOrders();
 
   void handleCustomerAuth();
   void handleCustomerRegister();

@@ -54,6 +54,11 @@ void App::init() {
       break;
     }
 
+    case SCREEN_RESTAURANT_ORDERS: {
+      App::handleRestaurantViewOrders();
+      break;
+    }
+
     case SCREEN_CUSTOMER_AUTH: {
       App::handleCustomerAuth();
       break;
@@ -123,6 +128,7 @@ void App::handleRoleSelection() {
 void App::handleRestaurantAuth() {
   Screen options[] = { SCREEN_RESTAURANT_REGISTER, SCREEN_RESTAURANT_LOGIN, SCREEN_ROLE_SELECTION, SCREEN_EXIT };
   int selection;
+  auth.setType(AUTH_TYPE_NONE);
   do {
     util.printTitle();
     util.printBlue("Restaurant Auth\n");
@@ -316,8 +322,8 @@ void App::handleRestaurantLogin() {
     }
     else {
       ((Restaurant*)user)->setMenu(db.getMenu(user->getId()));
-      cout << "Logged in successfully\n";
-      cout << "Press Enter to continue...";
+      util.printGreen("Logged in successfully\n");
+      util.printYellow("Press Enter to continue...");
       screen = SCREEN_RESTAURANT_MAIN_MENU;
     }
   }
@@ -383,7 +389,7 @@ void App::handleCustomerLogin() {
 }
 
 void App::handleRestaurantMainMenu() {
-  Screen options[] = { SCREEN_RESTAURANT_ADD_ITEM, SCREEN_RESTAURANT_DISPLAY_MENU };
+  Screen options[] = { SCREEN_RESTAURANT_ADD_ITEM, SCREEN_RESTAURANT_DISPLAY_MENU, SCREEN_RESTAURANT_ORDERS, SCREEN_ROLE_SELECTION };
   int selection;
 
   do {
@@ -392,21 +398,40 @@ void App::handleRestaurantMainMenu() {
     cout << "1. Add Item to Menu\n";
     cout << "2. Display Menu\n";
     cout << "3. View Orders\n";
-    cout << "4. Dispatch Current Order\n";
+    cout << "4. Logout\n";
 
     util.printPointer();
     cin >> selection;
   } while (selection < 1 || selection > 4);
 
   screen = options[selection - 1];
+}
+
+void App::handleRestaurantViewOrders() {
+  ((Restaurant*)user)->displayOrders();
+  int selection;
+  string firstOption;
+  OrderStatus firstStatus = ((Restaurant*)user)->getOrders()[0].getStatus();
+  if (firstStatus == ORDER_STATUS_PENDING) {
+    firstOption = "Mark as Processing";
+  }
+  else if (firstStatus == ORDER_STATUS_PROCESSING) {
+    firstOption = "Dispatch Order";
+  }
+  do {
+    util.printOptions({ firstOption.c_str(), "Mark As Dispatched", "Go Back" });
+    util.printPointer();
+    cin >> selection;
+    if (selection == 3) {
+      screen = SCREEN_RESTAURANT_MAIN_MENU;
+    }
+  } while (selection != 3);
 
 }
 
 void App::handleCustomerMainMenu() {
   Screen options[] = { SCREEN_CUSTOMER_EXPLORE_RESTAURANTS, SCREEN_CUSTOMER_CART, SCREEN_CUSTOMER_CURRENT_ORDER, SCREEN_ROLE_SELECTION };
   int selection;
-
-  cout << "HERE\n";
 
   do {
     string hello = "Welcome to Doof, " + user->getName() + ". How can we help you today?\n";
@@ -446,9 +471,10 @@ void App::handleRestaurantDisplayMenu() {
 }
 
 void App::handleExploreRestaurants() {
+  ((Customer*)user)->clearCart();
   vector<Restaurant> restaurants = db.getRestaurants();
   int count = 1;
-  util.printBlue("\nExplore your favorites!\n");
+  util.printBlue("Explore Your Favorite Restaurants!\n");
   for (Restaurant& res : restaurants) {
     string line = to_string(count) + ". " + res.getName() + "\n";
     util.printGreen(line);
@@ -483,61 +509,60 @@ void App::handleExploreRestaurants() {
 }
 
 void App::handleSelectedRestaurant() {
-  ((Customer*)user)->clearCart();
   cout << "\n";
   vector<Food> menu = ((Customer*)user)->getSelectedRestaurant().getMenu();
   string line = ((Customer*)user)->getSelectedRestaurant().getName() + " Menu\n";
-  util.printBlue(line);
 
   int selection = 0;
-
-  for (int i = 0; i < menu.size(); i++) {
-    Food& item = menu[i];
-    util.printLine(string(to_string(i + 1)) + string(". "));
-    util.printMagenta(item.getName());
-    util.printLine(string("    ") + string(to_string(item.getPrice())) + string(" BDT\n"));
-  }
-  cout << "\n";
-
   do {
-    util.printOptions({ "Select Item", "Show Cart", "Back", "Exit" });
-    util.printPointer();
-    cin >> selection;
-  } while (selection < 1 || selection > 4);
+    util.printBlue(line);
 
-  if (selection == 1) {
-    CartItem item;
-    int choice;
-    do {
-      util.printYellow("Item Index: ");
-      cin >> choice;
-    } while (choice < 1 || choice > menu.size());
-
-    item.setCartItem(&menu[choice - 1]);
-
+    for (int i = 0; i < menu.size(); i++) {
+      Food& item = menu[i];
+      util.printLine(string(to_string(i + 1)) + string(". "));
+      util.printMagenta(item.getName());
+      util.printLine(string("    ") + string(to_string(item.getPrice())) + string(" BDT\n"));
+    }
+    cout << "\n\n";
 
     do {
-      util.printYellow("Quantity: ");
-      cin >> choice;
-    } while (choice < 1);
+      util.printOptions({ "Select Item", "Show Cart", "Back", "Exit" });
+      util.printPointer();
+      cin >> selection;
+    } while (selection < 1 || selection > 4);
 
-    item.setQuantity(choice);
-    ((Customer*)user)->addToCart(item);
-    util.clearConsole();
-    string out = item.getCartItemFood()->getName() + " added.\n\n";
-    util.printGreen(out);
-  }
-  else if (selection == 2) {
-    screen = SCREEN_CUSTOMER_CART;
-  }
-  else if (selection == 3) {
-    ((Customer*)user)->clearCart();
-    screen = SCREEN_CUSTOMER_EXPLORE_RESTAURANTS;
-  }
-  else if (selection == 4) {
-    screen = SCREEN_EXIT;
-  }
+    if (selection == 1) {
+      CartItem item;
+      int choice;
+      do {
+        util.printYellow("Item Index: ");
+        cin >> choice;
+      } while (choice < 1 || choice > menu.size());
 
+      item.setCartItem(menu[choice - 1]);
+
+      do {
+        util.printYellow("Quantity: ");
+        cin >> choice;
+      } while (choice < 1);
+
+      item.setQuantity(choice);
+      ((Customer*)user)->addToCart(item);
+      util.clearConsole();
+      string out = item.getCartItemFood().getName() + " added.\n\n";
+      util.printGreen(out);
+    }
+    else if (selection == 2) {
+      screen = SCREEN_CUSTOMER_CART;
+    }
+    else if (selection == 3) {
+      ((Customer*)user)->clearCart();
+      screen = SCREEN_CUSTOMER_EXPLORE_RESTAURANTS;
+    }
+    else if (selection == 4) {
+      screen = SCREEN_EXIT;
+    }
+  } while (selection == 1);
 }
 
 void App::handleCustomerCart() {
@@ -549,7 +574,9 @@ void App::handleCustomerCart() {
     return;
   }
 
-  string header = ((Customer*)user)->getName() + "'s Cart\n";
+  cout << "HERE\n";
+
+  string header = user->getName() + "'s Cart\n";
   util.printBlue(header);
 
   int selection;
@@ -568,11 +595,12 @@ void App::handleCustomerCart() {
     order->markAsPending();
 
     ((Customer*)user)->setCurrentOrder(order);
+    db.insertOrder(*order);
+    ((Customer*)user)->setSelectedRestaurant(nullptr);
 
     util.printGreen("Got your order! It'll be at your doorstep in no time.\n");
     util.printYellow("Press Enter to return to Customer dashboard...");
-    scanf("%c");
-    ((Customer*)user)->setSelectedRestaurant(nullptr);
+    util.pressEnter();
     screen = SCREEN_CUSTOMER_MAIN_MENU;
   }
   else if (selection == 2) {

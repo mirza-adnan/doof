@@ -11,6 +11,7 @@ using namespace std;
 
 class Order {
 private:
+  int id;
   int restaurantID;
   int customerId;
   vector<CartItem> items;
@@ -18,9 +19,13 @@ private:
 public:
   Order();
 
+  Order(int o_id, int r_id, int c_id, OrderStatus stat);
+
   ~Order();
 
-  //getters
+  int getId() const;
+  void setId(int _id);
+
   vector<CartItem> getOrder() const;
 
   void addtoOrder(CartItem item);
@@ -43,6 +48,8 @@ public:
 
   const vector<CartItem>& getItems() const;
   void setItems(vector<CartItem> _items);
+
+  OrderStatus getStatus() const;
 };
 
 #endif

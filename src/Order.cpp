@@ -2,8 +2,20 @@
 
 Order::Order() {}
 
-Order::~Order() {
-  items.clear();
+Order::Order(int o_id, int r_id, int c_id, OrderStatus stat) {
+  id = o_id;
+  restaurantID = r_id;
+  customerId = c_id;
+  status = stat;
+}
+
+Order::~Order() {}
+
+int Order::getId() const {
+  return id;
+}
+void Order::setId(int _id) {
+  id = _id;
 }
 
 vector<CartItem> Order::getOrder() const {
@@ -21,7 +33,7 @@ void Order::removefromOrder(int index) {
 float Order::calculateTotal() {
   float price = 0;
   for (int i = 0; i < items.size(); i++) {
-    price += items[i].getCartItemFood()->getPrice() * items[i].getCartItemQuantity();
+    price += items[i].getCartItemFood().getPrice() * items[i].getCartItemQuantity();
   }
   return price;
 }
@@ -58,4 +70,8 @@ const vector<CartItem>& Order::getItems() const {
 }
 void Order::setItems(vector<CartItem> _items) {
   items = _items;
+}
+
+OrderStatus Order::getStatus() const {
+  return status;
 }

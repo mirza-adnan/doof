@@ -45,3 +45,47 @@ void Restaurant::displayMenu() {
   }
 }
 
+const vector<Order> Restaurant::getOrders() {
+  orders = db.getOrdersByRestaurantId(Restaurant::getId());
+  return orders;
+}
+void Restaurant::addOrder(Order order) {
+  orders.push_back(order);
+}
+
+void Restaurant::displayOrders() {
+  orders = db.getOrdersByRestaurantId(Restaurant::getId());
+  cout << left << setw(10) << "Order ID" << setw(15) << "Customer ID" << setw(15)
+    << "Restaurant ID" << setw(15) << "Status" << setw(15) << "Total Price" << endl;
+  cout << string(70, '=') << endl;
+
+  for (size_t i = 0; i < orders.size(); ++i) {
+    Order order = orders[i];
+
+    // Display basic order details
+    string status;
+    switch (order.getStatus()) {
+    case ORDER_STATUS_PENDING: status = "Pending"; break;
+    case ORDER_STATUS_PROCESSING: status = "Processing"; break;
+    case ORDER_STATUS_DELIVERED: status = "Delivered"; break;
+    default: status = "Unknown";
+    }
+
+    cout << left << setw(10) << order.getId()
+      << setw(15) << order.getCustomerId()
+      << setw(15) << order.getRestaurantId()
+      << setw(15) << status
+      << fixed << setprecision(2) << order.calculateTotal() << endl;
+
+    const vector<CartItem>& items = order.getItems();
+    for (const CartItem& item : items) {
+      cout << "    - " << item.getCartItemFood().getName()
+        << " x" << item.getCartItemQuantity()
+        << " ($" << fixed << setprecision(2) << item.getPrice() << ")" << endl;
+    }
+
+    cout << endl;
+  }
+}
+
+

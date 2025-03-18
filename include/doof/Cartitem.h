@@ -7,20 +7,20 @@ using namespace std;
 
 class CartItem {
 private:
-  Food* food;
+  Food food;
   int quantity;
 
 public:
   CartItem();
 
   //getters
-  Food* getCartItemFood();
-  int getQuantity();
+  Food getCartItemFood() const;
+  int getQuantity() const;
 
-  int getCartItemQuantity();
+  int getCartItemQuantity() const;
 
   //setters
-  void setCartItem(Food* fd);
+  void setCartItem(Food fd);
   void setQuantity(int _q);
 
 
@@ -28,7 +28,7 @@ public:
 
   void incrementQuantity(int inc);
 
-  float getPrice();
+  float getPrice() const;
 };
 
 #endif

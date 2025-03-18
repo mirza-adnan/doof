@@ -63,7 +63,168 @@ void DB::createTables() {
     "c_address TEXT,"
     "c_contact TEXT);"
   );
+
+  DB::execute(
+    "CREATE TABLE IF NOT EXISTS Orders("
+    "o_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+    "c_id INTEGER NOT NULL,"
+    "r_id INTEGER NOT NULL,"
+    "o_status INTEGER NOT NULL CHECK (o_status in (0, 1, 2, 3)),"
+    "FOREIGN KEY(c_id) REFERENCES Customer(c_id),"
+    "FOREIGN KEY(r_id) REFERENCES Restaurant(r_id)"
+    ");"
+  );
+
+  DB::execute(
+    "CREATE TABLE IF NOT EXISTS OrderItems("
+    "oi_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+    "o_id INTEGER NOT NULL,"
+    "f_id INTEGER NOT NULL,"
+    "quantity INTEGER NOT NULL,"
+    "FOREIGN KEY(o_id) REFERENCES Orders(o_id),"
+    "FOREIGN KEY(f_id) REFERENCES Food(f_id)"
+    ");"
+  );
 }
+
+bool DB::insertOrder(Order& order) {
+  sqlite3_stmt* stmt;
+  string sql = "INSERT INTO Orders (c_id, r_id, o_status) VALUES (?, ?, ?);";
+
+  if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+    cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << "\n";
+    return false;
+  }
+
+  sqlite3_bind_int(stmt, 1, order.getCustomerId());
+  sqlite3_bind_int(stmt, 2, order.getRestaurantId());
+  sqlite3_bind_int(stmt, 3, static_cast<int>(order.getStatus()));
+
+  if (sqlite3_step(stmt) != SQLITE_DONE) {
+    cerr << "Failed to execute statement: " << sqlite3_errmsg(db) << "\n";
+    sqlite3_finalize(stmt);
+    return false;
+  }
+
+  int orderId = sqlite3_last_insert_rowid(db);
+  order.setId(orderId);
+  sqlite3_finalize(stmt);
+
+  // Inserting order items
+  sql = "INSERT INTO OrderItems (o_id, f_id, quantity) VALUES (?, ?, ?);";
+
+  for (const auto& item : order.getItems()) {
+    if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+      cerr << "Failed to prepare order item statement: " << sqlite3_errmsg(db) << "\n";
+      return false;
+    }
+
+    sqlite3_bind_int(stmt, 1, orderId);
+    sqlite3_bind_int(stmt, 2, item.getCartItemFood().getId());
+    sqlite3_bind_int(stmt, 3, item.getQuantity());
+
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+      cerr << "Failed to execute order item insertion: " << sqlite3_errmsg(db) << "\n";
+      sqlite3_finalize(stmt);
+      return false;
+    }
+
+    sqlite3_finalize(stmt);
+  }
+
+  return true;
+}
+
+vector<Order> DB::getOrdersByCustomerId(int customerId) {
+  sqlite3_stmt* stmt;
+  std::vector<Order> orders;
+
+  string sql = "SELECT o_id, r_id, o_status FROM Orders WHERE c_id = ? AND o_status IN (0, 1, 2));";
+
+  if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+    cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << "\n";
+    return orders;
+  }
+
+  sqlite3_bind_int(stmt, 1, customerId);
+
+  while (sqlite3_step(stmt) == SQLITE_ROW) {
+    int orderId = sqlite3_column_int(stmt, 0);
+    int restaurantId = sqlite3_column_int(stmt, 1);
+    OrderStatus status = static_cast<OrderStatus>(sqlite3_column_int(stmt, 2));
+
+    Order order(orderId, customerId, restaurantId, status);
+
+    sqlite3_stmt* itemStmt;
+    std::string itemSql = "SELECT f_id, quantity FROM OrderItems WHERE o_id = ?;";
+
+    if (sqlite3_prepare_v2(db, itemSql.c_str(), -1, &itemStmt, nullptr) == SQLITE_OK) {
+      sqlite3_bind_int(itemStmt, 1, orderId);
+
+      while (sqlite3_step(itemStmt) == SQLITE_ROW) {
+        int foodId = sqlite3_column_int(itemStmt, 0);
+        int quantity = sqlite3_column_int(itemStmt, 1);
+        Food food = DB::getFoodById(foodId);
+        CartItem item;
+        item.setCartItem(food);
+        item.setQuantity(quantity);
+        order.addtoOrder(item);
+      }
+    }
+    sqlite3_finalize(itemStmt);
+
+    orders.push_back(order);
+  }
+
+  sqlite3_finalize(stmt);
+  return orders;
+}
+
+vector<Order> DB::getOrdersByRestaurantId(int restaurantId) {
+  sqlite3_stmt* stmt;
+  std::vector<Order> orders;
+
+  string sql = "SELECT o_id, c_id, o_status FROM Orders WHERE r_id = ? AND o_status != 3;";
+
+  if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+    cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << "\n";
+    return orders;
+  }
+
+  sqlite3_bind_int(stmt, 1, restaurantId);
+
+  while (sqlite3_step(stmt) == SQLITE_ROW) {
+    int orderId = sqlite3_column_int(stmt, 0);
+    int customerId = sqlite3_column_int(stmt, 1);
+    OrderStatus status = static_cast<OrderStatus>(sqlite3_column_int(stmt, 2));
+
+    Order order(orderId, customerId, restaurantId, status);
+
+    sqlite3_stmt* itemStmt;
+    std::string itemSql = "SELECT f_id, quantity FROM OrderItems WHERE o_id = ?;";
+
+    if (sqlite3_prepare_v2(db, itemSql.c_str(), -1, &itemStmt, nullptr) == SQLITE_OK) {
+      sqlite3_bind_int(itemStmt, 1, orderId);
+
+      while (sqlite3_step(itemStmt) == SQLITE_ROW) {
+        int foodId = sqlite3_column_int(itemStmt, 0);
+        int quantity = sqlite3_column_int(itemStmt, 1);
+        Food food = DB::getFoodById(foodId);
+        CartItem item;
+        item.setCartItem(food);
+        item.setQuantity(quantity);
+        order.addtoOrder(item);
+      }
+    }
+    sqlite3_finalize(itemStmt);
+
+    orders.push_back(order);
+  }
+
+  sqlite3_finalize(stmt);
+  return orders;
+}
+
 
 bool DB::insertRestaurant(Restaurant& restaurant) const {
   bool success = true;
@@ -196,6 +357,29 @@ void DB::insertFood(Food& food) const {
   cout << "Food inserted successfully with ID: " << foodId << "\n";
 
   sqlite3_finalize(stmt);
+}
+
+Food DB::getFoodById(int foodId) {
+  sqlite3_stmt* stmt;
+  std::string sql = "SELECT f_name, f_price, r_id FROM Food WHERE f_id = ?;";
+
+  if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+    cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << "\n";
+    return Food();
+  }
+
+  sqlite3_bind_int(stmt, 1, foodId);
+
+  if (sqlite3_step(stmt) == SQLITE_ROW) {
+    std::string name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+    double price = sqlite3_column_double(stmt, 1);
+    int restaurantId = sqlite3_column_int(stmt, 2);
+    sqlite3_finalize(stmt);
+    return Food(foodId, name, price, restaurantId);
+  }
+
+  sqlite3_finalize(stmt);
+  return Food();
 }
 
 vector<Food> DB::getMenu(const int restaurantId) const {
