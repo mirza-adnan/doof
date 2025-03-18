@@ -5,14 +5,17 @@ extern Util util;
 
 Customer::Customer() {}
 
-Customer::Customer(const string& _name, const string& _email, const string& _pass, const string& _contact, const string& _addr) : User(_name, _email, _pass, _contact, _addr) {}
+Customer::Customer(const string& _name, const string& _email, const string& _pass, const string& _contact, const string& _addr) : User(_name, _email, _pass, _contact, _addr) {
+  currentorder = nullptr;
+}
 
 Customer::~Customer() {
   delete selectedRestaurant;
+  delete currentorder;
 }
 
 void Customer::addtoHistory() {
-  orderHistory.push_back(currentorder);
+  orderHistory.push_back(*currentorder);
 }
 
 Restaurant& Customer::getSelectedRestaurant() {
@@ -45,6 +48,18 @@ void Customer::displayCart() {
   }
 
   cout << "\n\n";
+}
+
+bool Customer::isCartEmpty() const {
+  return cart.empty();
+}
+
+void Customer::setCurrentOrder(Order* order) {
+  currentorder = order;
+}
+
+const Order* Customer::getCurrentOrder() {
+  return currentorder;
 }
 
 

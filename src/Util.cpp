@@ -77,4 +77,14 @@ void Util::clearConsole() const {
   system("clear");
 }
 
+void Util::printOptions(vector<string> options) const {
+  for (int i = 0; i < options.size(); i++) {
+    cout << i + 1 << ". " << options[i] << "\n";
+  }
+}
+
+void Util::pressEnter() const {
+  while (getchar() != '\n');
+}
+
 Util util;

@@ -27,6 +27,8 @@ public:
   void printLine(const string& str) const;
   void printBanner() const;
   void clearConsole() const;
+  void printOptions(vector<string> options) const;
+  void pressEnter() const;
 };
 
 #endif

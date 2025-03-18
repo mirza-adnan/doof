@@ -12,7 +12,7 @@ using namespace std;
 class Order {
 private:
   int restaurantID;
-  int userID;
+  int customerId;
   vector<CartItem> items;
   OrderStatus status;
 public:
@@ -34,6 +34,15 @@ public:
   void markAsProcessing();
 
   void markAsDelivered();
+
+  int getRestaurantId() const;
+  void setRestaurantId(int id);
+
+  int getCustomerId() const;
+  void setCustomerId(int id);
+
+  const vector<CartItem>& getItems() const;
+  void setItems(vector<CartItem> _items);
 };
 
 #endif

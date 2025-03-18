@@ -17,11 +17,10 @@ class Restaurant;
 
 class Customer : public User {
 private:
-  Order currentorder;
+  Order* currentorder;
   vector<Order> orderHistory;
   Restaurant* selectedRestaurant;
   vector<CartItem> cart;
-
 
 public:
   Customer();
@@ -37,6 +36,10 @@ public:
   void addToCart(CartItem item);
   void clearCart();
   void displayCart();
+  bool isCartEmpty() const;
+
+  void setCurrentOrder(Order* order);
+  const Order* getCurrentOrder();
 };
 
 #endif
