@@ -31,4 +31,8 @@ void CartItem::setQuantity(int _q) {
   quantity = _q;
 }
 
+float CartItem::getPrice() {
+  return food->getPrice() * quantity;
+}
+
 

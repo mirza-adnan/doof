@@ -27,6 +27,8 @@ public:
   void incrementQuantity();
 
   void incrementQuantity(int inc);
+
+  float getPrice();
 };
 
 #endif
