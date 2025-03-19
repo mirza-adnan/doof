@@ -11,10 +11,10 @@
 
 class Util {
 private:
-  vector<string> colors;
 
 public:
   Util();
+  vector<string> colors;
   void printPointer() const;
   void printTitle() const;
   void doWhile(string& str, const string& comp, const string& prompt) const;

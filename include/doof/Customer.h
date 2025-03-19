@@ -40,6 +40,8 @@ public:
 
   void setCurrentOrder(Order* order);
   const Order* getCurrentOrder();
+
+  void displayCurrentOrder();
 };
 
 #endif

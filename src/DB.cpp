@@ -139,7 +139,7 @@ vector<Order> DB::getOrdersByCustomerId(int customerId) {
   sqlite3_stmt* stmt;
   std::vector<Order> orders;
 
-  string sql = "SELECT o_id, r_id, o_status FROM Orders WHERE c_id = ? AND o_status IN (0, 1, 2));";
+  string sql = "SELECT o_id, r_id, o_status FROM Orders WHERE c_id = ? AND o_status IN (0, 1, 2);";
 
   if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
     cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << "\n";

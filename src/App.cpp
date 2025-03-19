@@ -94,6 +94,11 @@ void App::init() {
       break;
     }
 
+    case SCREEN_CUSTOMER_CURRENT_ORDER: {
+      App::handleCustomerCurrentOrder();
+      break;
+    }
+
     default: {
       screen = SCREEN_EXIT;
       break;
@@ -617,4 +622,16 @@ void App::handleCustomerCart() {
   else if (selection == 4) {
     screen = SCREEN_EXIT;
   }
+}
+
+void App::handleCustomerCurrentOrder() {
+  int selection;
+  Screen options[] = { SCREEN_CUSTOMER_MAIN_MENU };
+  do {
+    ((Customer*)user)->displayCurrentOrder();
+    util.printOptions({ "Go Back" });
+    util.printPointer();
+    cin >> selection;
+  } while (selection < 1 || selection > 1);
+  screen = options[selection - 1];
 }

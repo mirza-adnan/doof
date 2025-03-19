@@ -2,6 +2,7 @@
 #include "doof/Restaurant.h"
 
 extern Util util;
+extern DB db;
 
 Customer::Customer() {}
 
@@ -60,6 +61,40 @@ void Customer::setCurrentOrder(Order* order) {
 const Order* Customer::getCurrentOrder() {
   return currentorder;
 }
+
+void Customer::displayCurrentOrder() {
+  vector<Order> orders = db.getOrdersByCustomerId(Customer::getId());
+  // potentially replace this with a separate checker function
+  if (orders.empty()) {
+    cout << util.colors[COLOR_RED] << "No current order found." << util.colors[COLOR_DEFAULT] << "\n";
+    return;
+  }
+
+  currentorder = new Order(orders[0]);
+
+  cout << util.colors[COLOR_BLUE] << "\n--- Current Order Details ---\n" << util.colors[COLOR_DEFAULT];
+  cout << "Order ID: " << currentorder->getId() << "\n";
+  cout << "Restaurant ID: " << currentorder->getRestaurantId() << "\n";
+  cout << "Order Status: " << util.colors[COLOR_YELLOW] << currentorder->getStatus() << util.colors[COLOR_DEFAULT] << "\n";
+
+  cout << "\nItems in Order:\n";
+  cout << left << setw(20) << "Food Name" << setw(10) << "Quantity" << setw(10) << "Price" << endl;
+  cout << string(40, '-') << endl;
+
+  double totalCost = 0.0;
+
+  for (const auto& item : currentorder->getItems()) {
+    const Food& food = item.getCartItemFood();
+    double itemCost = item.getPrice();
+    totalCost += itemCost;
+
+    cout << left << setw(20) << food.getName() << setw(10) << item.getQuantity() << setw(10) << fixed << setprecision(2) << food.getPrice() << endl;
+  }
+
+  cout << string(40, '-') << endl;
+  cout << "Total Cost: " << util.colors[COLOR_GREEN] << fixed << setprecision(2) << totalCost << util.colors[COLOR_DEFAULT] << "\n\n";
+}
+
 
 
 
