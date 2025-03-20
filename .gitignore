@@ -2,3 +2,4 @@ doof.db
 *.exe
 .vscode
 lib
+doof_prod.db
