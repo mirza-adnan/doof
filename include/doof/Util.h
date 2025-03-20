@@ -13,8 +13,9 @@ class Util {
 private:
 
 public:
-  Util();
   vector<string> colors;
+
+  Util();
   void printPointer() const;
   void printTitle() const;
   void doWhile(string& str, const string& comp, const string& prompt) const;
