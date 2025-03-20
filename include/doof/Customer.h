@@ -42,6 +42,8 @@ public:
   const Order* getCurrentOrder();
 
   void displayCurrentOrder();
+
+  bool hasOngoingOrder() const;
 };
 
 #endif

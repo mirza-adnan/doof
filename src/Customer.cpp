@@ -59,6 +59,9 @@ void Customer::setCurrentOrder(Order* order) {
 }
 
 const Order* Customer::getCurrentOrder() {
+  vector<Order> orders = db.getOrdersByCustomerId(Customer::getId());
+  delete currentorder;
+  currentorder = new Order(orders[0]);
   return currentorder;
 }
 
@@ -71,11 +74,23 @@ void Customer::displayCurrentOrder() {
   }
 
   currentorder = new Order(orders[0]);
+  string orderStatusStr;
+  switch (currentorder->getStatus()) {
+  case ORDER_STATUS_PENDING:
+    orderStatusStr = "Pending";
+    break;
+  case ORDER_STATUS_PROCESSING:
+    orderStatusStr = "Processing";
+    break;
+  case ORDER_STATUS_DISPATCHED:
+    orderStatusStr = "Dispatched";
+    break;
+  }
 
   cout << util.colors[COLOR_BLUE] << "\n--- Current Order Details ---\n" << util.colors[COLOR_DEFAULT];
   cout << "Order ID: " << currentorder->getId() << "\n";
   cout << "Restaurant ID: " << currentorder->getRestaurantId() << "\n";
-  cout << "Order Status: " << util.colors[COLOR_YELLOW] << currentorder->getStatus() << util.colors[COLOR_DEFAULT] << "\n";
+  cout << "Order Status: " << util.colors[COLOR_YELLOW] << orderStatusStr << util.colors[COLOR_DEFAULT] << "\n";
 
   cout << "\nItems in Order:\n";
   cout << left << setw(20) << "Food Name" << setw(10) << "Quantity" << setw(10) << "Price" << endl;
@@ -93,6 +108,11 @@ void Customer::displayCurrentOrder() {
 
   cout << string(40, '-') << endl;
   cout << "Total Cost: " << util.colors[COLOR_GREEN] << fixed << setprecision(2) << totalCost << util.colors[COLOR_DEFAULT] << "\n\n";
+}
+
+bool Customer::hasOngoingOrder() const {
+  vector<Order> orders = db.getOrdersByCustomerId(Customer::getId());
+  return !orders.empty();
 }
 
 
