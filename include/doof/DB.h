@@ -40,5 +40,6 @@ public:
   bool insertOrder(Order& order);
   vector<Order> getOrdersByCustomerId(int customerId);
   vector<Order> getOrdersByRestaurantId(int customerId);
+  bool updateOrderStatus(int orderId, OrderStatus newStatus);
 };
 #endif

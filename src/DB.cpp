@@ -184,7 +184,7 @@ vector<Order> DB::getOrdersByRestaurantId(int restaurantId) {
   sqlite3_stmt* stmt;
   std::vector<Order> orders;
 
-  string sql = "SELECT o_id, c_id, o_status FROM Orders WHERE r_id = ? AND o_status != 3;";
+  string sql = "SELECT o_id, c_id, o_status FROM Orders WHERE r_id = ? AND o_status IN (0, 1) ORDER BY o_id ASC;";
 
   if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
     cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << "\n";
@@ -225,6 +225,27 @@ vector<Order> DB::getOrdersByRestaurantId(int restaurantId) {
   return orders;
 }
 
+bool DB::updateOrderStatus(int orderId, OrderStatus newStatus) {
+  sqlite3_stmt* stmt;
+  std::string sql = "UPDATE Orders SET o_status = ? WHERE o_id = ?;";
+
+  if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+    cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << "\n";
+    return false;
+  }
+
+  sqlite3_bind_int(stmt, 1, static_cast<int>(newStatus));
+  sqlite3_bind_int(stmt, 2, orderId);
+
+  if (sqlite3_step(stmt) != SQLITE_DONE) {
+    cerr << "Failed to update order status: " << sqlite3_errmsg(db) << "\n";
+    sqlite3_finalize(stmt);
+    return false;
+  }
+
+  sqlite3_finalize(stmt);
+  return true;
+}
 
 bool DB::insertRestaurant(Restaurant& restaurant) const {
   bool success = true;
