@@ -39,16 +39,41 @@ void Customer::clearCart() {
 }
 
 void Customer::displayCart() {
-  for (int i = 0; i < cart.size(); i++) {
-    CartItem& item = cart[i];
-    float price = item.getCartItemFood().getPrice() * item.getQuantity();
-    util.printLine(string(to_string(i + 1)) + string(". "));
-    util.printGreen(item.getCartItemFood().getName());
-    util.printLine(string("  -----  ") + to_string(price) + string(" BDT\n"));
+  if (cart.empty()) {
+    cout << util.colors[COLOR_RED] << "Your cart is empty." << util.colors[COLOR_DEFAULT] << "\n\n";
+    return;
   }
 
-  cout << "\n\n";
+  cout << util.colors[COLOR_BLUE] << left
+    << setw(5) << "No."
+    << setw(25) << "Food Name"
+    << setw(15) << "Quantity"
+    << setw(15) << "Total Price (BDT)"
+    << util.colors[COLOR_DEFAULT] << endl;
+
+  cout << util.colors[COLOR_MAGENTA] << string(70, '=') << util.colors[COLOR_DEFAULT] << endl;
+
+  double grandTotal = 0.0;
+
+  for (int i = 0; i < cart.size(); i++) {
+    CartItem& item = cart[i];
+    const Food& food = item.getCartItemFood();
+    float price = food.getPrice() * item.getQuantity();
+    grandTotal += price;
+
+    cout << left << setw(5) << (i + 1)
+      << setw(25) << food.getName()
+      << setw(15) << item.getQuantity()
+      << setw(15) << fixed << setprecision(2) << price << endl;
+  }
+
+  cout << util.colors[COLOR_MAGENTA] << string(70, '=') << util.colors[COLOR_DEFAULT] << endl;
+
+  cout << util.colors[COLOR_GREEN]
+    << "Grand Total: " << fixed << setprecision(2) << grandTotal << " BDT"
+      << util.colors[COLOR_DEFAULT] << "\n\n";
 }
+
 
 bool Customer::isCartEmpty() const {
   return cart.empty();

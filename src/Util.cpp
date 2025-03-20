@@ -70,7 +70,13 @@ void Util::printLine(const string& str) const {
 }
 
 void Util::printBanner() const {
-
+  cout << "  _____              ______ \n";
+  cout << " |  __ \\            |  ____|\n";
+  cout << " | |  | | ___   ___ | |__   \n";
+  cout << " | |  | |/ _ \\ / _ \\|  __|  \n";
+  cout << " | |__| | (o) | (o) | |     \n";
+  cout << " |_____/ \\___/ \\___/|_|     \n";
+  cout << "\n\n";
 }
 
 void Util::clearConsole() const {

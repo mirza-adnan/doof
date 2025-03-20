@@ -198,7 +198,7 @@ vector<Order> DB::getOrdersByRestaurantId(int restaurantId) {
     int customerId = sqlite3_column_int(stmt, 1);
     OrderStatus status = static_cast<OrderStatus>(sqlite3_column_int(stmt, 2));
 
-    Order order(orderId, customerId, restaurantId, status);
+    Order order(orderId, restaurantId, customerId, status);
 
     sqlite3_stmt* itemStmt;
     std::string itemSql = "SELECT f_id, quantity FROM OrderItems WHERE o_id = ?;";

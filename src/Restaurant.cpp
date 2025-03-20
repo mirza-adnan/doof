@@ -71,17 +71,15 @@ void Restaurant::addOrder(Order order) {
 void Restaurant::displayOrders() {
   orders = db.getOrdersByRestaurantId(Restaurant::getId());
   cout << util.colors[COLOR_BLUE] << left << setw(10) << "Order ID"
-    << setw(15) << "Customer ID" << setw(15)
-    << "Restaurant ID" << setw(15) << "Status"
-    << setw(15) << "Total Price" << util.colors[COLOR_DEFAULT] << endl;
-  cout << util.colors[COLOR_DEFAULT] << string(70, '=') << util.colors[COLOR_DEFAULT] << endl;
+    << setw(15) << "Customer ID" << setw(15) << "Status"
+    << setw(15) << "Total Price(BDT)" << util.colors[COLOR_DEFAULT] << endl;
+  cout << util.colors[COLOR_MAGENTA] << string(70, '=') << util.colors[COLOR_DEFAULT] << endl;
 
   for (size_t i = 0; i < orders.size(); ++i) {
     Order order = orders[i];
 
-    // Display basic order details
     string status;
-    string statusColor = util.colors[COLOR_YELLOW];  // Default to yellow for Pending
+    string statusColor = util.colors[COLOR_YELLOW];
 
     switch (order.getStatus()) {
     case ORDER_STATUS_PENDING:
@@ -107,17 +105,16 @@ void Restaurant::displayOrders() {
 
     cout << left << setw(10) << order.getId()
       << setw(15) << order.getCustomerId()
-      << setw(15) << order.getRestaurantId()
       << statusColor << setw(15) << status << util.colors[COLOR_DEFAULT]
-      << fixed << setprecision(2) << order.calculateTotal() << endl;
+      << fixed << setprecision(2) << order.calculateTotal() << "\n";
 
       const vector<CartItem>& items = order.getItems();
       for (const CartItem& item : items) {
-        cout << "    " << util.colors[COLOR_MAGENTA] << "- "
+        cout << "    " << util.colors[COLOR_GREEN] << "- "
           << item.getCartItemFood().getName()
           << " x" << item.getCartItemQuantity() << util.colors[COLOR_DEFAULT]
-          << " ($" << fixed << setprecision(2)
-            << item.getPrice() << ")" << "\n";
+          << " (" << fixed << setprecision(2)
+            << item.getPrice() << " BDT)" << "\n";
       }
 
       cout << "\n";

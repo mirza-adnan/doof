@@ -111,14 +111,14 @@ void App::init() {
 
 void App::handleRoleSelection() {
   util.clearConsole();
-  util.printBlue("===== WELCOME TO DOOF =====\n");
+  util.printBanner();
   delete user;
   user = nullptr;
 
   Screen options[] = { SCREEN_RESTAURANT_AUTH, SCREEN_CUSTOMER_AUTH, SCREEN_EXIT };
   int selection;
   do {
-    util.printLine("Select your role:\n");
+    util.printBlue("Role Selection\n");
     util.printLine("1. Restaurant\n");
     util.printLine("2. Customer\n");
     util.printLine("3. Exit\n");
@@ -171,6 +171,11 @@ void App::handleCustomerRegister() {
     util.printYellow("Email: ");
     getline(cin, email);
 
+    if (email == "") {
+      screen = SCREEN_CUSTOMER_AUTH;
+      return;
+    }
+
     if (db.customerEmailExists(email)) {
       cout << "A customer with that email already exists.\n";
       string selection;
@@ -201,7 +206,7 @@ void App::handleCustomerRegister() {
   while (true) {
     util.doWhile(contact, "", "Contact Number: ");
     if (contact.size() != 11) {
-      util.printRed("Contact number must be 11 digits.");
+      util.printRed("Contact number must be 11 digits.\n");
     }
     else break;
   }
@@ -215,17 +220,23 @@ void App::handleCustomerRegister() {
   user = customer;
   screen = SCREEN_CUSTOMER_MAIN_MENU;
 
-  cout << "Press Enter to continue...";
+  util.printGreen("\nRegistered successfully!\n");
+  util.printYellow("Press Enter to continue...");
 }
 
 void App::handleRestaurantRegister() {
   string email;
   bool valid = true;
-  cout << "\n\n\n***  Restaurant Registration  ***\n";
+  util.printBlue("Restaurant Registration\n");
 
   do {
-    cout << "Email: ";
+    util.printYellow("Email: ");
     getline(cin, email);
+
+    if (email == "") {
+      screen = SCREEN_RESTAURANT_AUTH;
+      return;
+    }
 
     if (db.restaurantEmailExists(email)) {
       cout << "A restaurant with that email already exists.\n";
@@ -256,7 +267,7 @@ void App::handleRestaurantRegister() {
   while (true) {
     util.doWhile(contact, "", "Contact Number: ");
     if (contact.size() != 11) {
-      util.printRed("Contact number must be 11 digits.");
+      util.printRed("Contact number must be 11 digits.\n");
     }
     else break;
   }
@@ -266,7 +277,7 @@ void App::handleRestaurantRegister() {
 
   int type;
   do {
-    cout << "Restaurant Type: \n";
+    util.printYellow("Restaurant Type: \n");
     cout << "1. Fast Food\n";
     cout << "2. Cafe\n";
     cout << "3. Fine Dining\n";
@@ -286,13 +297,14 @@ void App::handleRestaurantLogin() {
   string email;
   bool validEmail;
 
-  util.printBlue("\nRestaurant Login\n");
+  util.printBlue("Restaurant Login\n");
   do {
-    cout << "Email: ";
+    util.printYellow("Email: ");
     getline(cin, email);
 
     if (email == "") {
-      continue;
+      screen = SCREEN_RESTAURANT_AUTH;
+      return;
     }
 
     if (!db.restaurantEmailExists(email)) {
@@ -348,7 +360,7 @@ void App::handleCustomerLogin() {
     getline(cin, email);
 
     if (email == "") {
-      continue;
+      screen = SCREEN_CUSTOMER_AUTH;
     }
 
     if (!db.customerEmailExists(email)) {
@@ -383,8 +395,9 @@ void App::handleCustomerLogin() {
       throw runtime_error("");
     }
     else {
-      cout << "Logged in successfully.\n";
-      cout << "Press Enter to continue...";
+      util.clearConsole();
+      util.printGreen("Logged in successfully.\n");
+      util.printYellow("\nPress Enter to continue...");
       screen = SCREEN_CUSTOMER_MAIN_MENU;
     }
   }
@@ -399,12 +412,12 @@ void App::handleRestaurantMainMenu() {
   int selection;
 
   do {
-    cout << "\n" << user->getName();
-    cout << " Main Menu\n";
+    util.printBlue(user->getName());
+    util.printBlue(" Main Menu\n");
     cout << "1. Add Item to Menu\n";
     cout << "2. Display Menu\n";
     cout << "3. View Orders\n";
-    cout << "4. Logout\n";
+    cout << "4. Logout\n\n";
 
     util.printPointer();
     cin >> selection;
@@ -417,16 +430,14 @@ void App::handleRestaurantViewOrders() {
   ((Restaurant*)user)->displayOrders();
   int selection;
   string firstOption;
-  cout << "Hello 1\n";
   if (((Restaurant*)user)->getOrders().empty()) {
-    util.printRed("No ongoing orders\n");
+    util.printRed("No ongoing orders\n\n");
     util.printYellow("Press Enter to go back...");
-    util.pressEnter();
     screen = SCREEN_RESTAURANT_MAIN_MENU;
     return;
   }
 
-  cout << "Hello 2\n";
+  cout << util.colors[COLOR_BLUE] << user->getName() << "'s Orders\n" << util.colors[COLOR_DEFAULT];
   Order order = ((Restaurant*)user)->getOrders()[0];
   OrderStatus firstStatus = order.getStatus();
   if (firstStatus == ORDER_STATUS_PENDING) {
@@ -474,11 +485,15 @@ void App::handleCustomerMainMenu() {
 
 void App::handleRestaurantAddItem() {
   string name;
-  util.doWhile(name, "", "Item Name: ");
+  util.printYellow("Item Name: ");
+  getline(cin, name);
+  if (name == "") {
+    screen = SCREEN_RESTAURANT_MAIN_MENU;
+  }
 
   float price;
   do {
-    cout << "Price: ";
+    util.printYellow("Price: ");
     cin >> price;
   } while (price <= 0);
 
@@ -486,11 +501,14 @@ void App::handleRestaurantAddItem() {
   ((Restaurant*)user)->addToMenu(food);
 
   cout << "Item successfully added to the menu!\n";
+  util.pressEnter();
   screen = SCREEN_RESTAURANT_MAIN_MENU;
 }
 
 void App::handleRestaurantDisplayMenu() {
   ((Restaurant*)user)->displayMenu();
+  cout << "\n";
+  util.printYellow("Press Enter to go back...");
   screen = SCREEN_RESTAURANT_MAIN_MENU;
 }
 
@@ -498,38 +516,67 @@ void App::handleExploreRestaurants() {
   ((Customer*)user)->clearCart();
   vector<Restaurant> restaurants = db.getRestaurants();
   int count = 1;
-  util.printBlue("Explore Your Favorite Restaurants!\n");
-  for (Restaurant& res : restaurants) {
-    string line = to_string(count) + ". " + res.getName() + "\n";
-    util.printGreen(line);
-    cout << "      " << "(" << res.getType() << ")\n";
-    count++;
-  }
+  cout << util.colors[COLOR_BLUE]
+    << left << setw(5) << "No."
+      << setw(30) << "Restaurant Name"
+      << setw(20) << "Type"
+      << util.colors[COLOR_DEFAULT] << endl;
 
-  cout << "\n";
+    cout << util.colors[COLOR_MAGENTA] << string(60, '=') << util.colors[COLOR_DEFAULT] << endl;
 
-  int selection;
-  do {
-    util.printLine("1. Select Restaurant\n");
-    util.printLine("2. Back\n");
-    util.printPointer();
-    cin >> selection;
-  } while (selection < 1 || selection > 2);
+    for (Restaurant& res : restaurants) {
+      string type;
+      switch (res.getType()) {
+      case RESTAURANT_TYPE_CAFE:
+        type = "Cafe";
+        break;
 
-  if (selection == 1) {
+      case RESTAURANT_TYPE_FAST_FOOD:
+        type = "Fast Food";
+        break;
+
+      case RESTAURANT_TYPE_FINE_DINING:
+        type = "Fine Dining";
+        break;
+
+      default:
+        type = "Unknown";
+        break;
+      }
+
+      cout << util.colors[COLOR_DEFAULT]
+        << left << setw(5) << count
+          << setw(30) << res.getName()
+          << setw(20) << ("(" + type + ")")
+          << util.colors[COLOR_DEFAULT] << endl;
+        count++;
+    }
+
+    cout << "\n\n";
+
+    int selection;
     do {
-      util.printYellow("Restaurant Index: ");
+      util.printBlue("Explore Your Favorite Restaurants!\n");
+      util.printLine("1. Select Restaurant\n");
+      util.printLine("2. Back\n");
+      util.printPointer();
       cin >> selection;
-    } while (selection < 1 || selection > restaurants.size());
+    } while (selection < 1 || selection > 2);
 
-    Restaurant* selected = new Restaurant(restaurants[selection - 1]);
+    if (selection == 1) {
+      do {
+        util.printYellow("Restaurant Index: ");
+        cin >> selection;
+      } while (selection < 1 || selection > restaurants.size());
 
-    ((Customer*)user)->setSelectedRestaurant(selected);
-    screen = SCREEN_CUSTOMER_SELECTED_RESTAURANT;
-  }
-  else if (selection == 2) {
-    screen = SCREEN_CUSTOMER_MAIN_MENU;
-  }
+      Restaurant* selected = new Restaurant(restaurants[selection - 1]);
+
+      ((Customer*)user)->setSelectedRestaurant(selected);
+      screen = SCREEN_CUSTOMER_SELECTED_RESTAURANT;
+    }
+    else if (selection == 2) {
+      screen = SCREEN_CUSTOMER_MAIN_MENU;
+    }
 }
 
 void App::handleSelectedRestaurant() {
@@ -540,12 +587,12 @@ void App::handleSelectedRestaurant() {
 
   int selection = 0;
   do {
-    util.printBlue(line);
     res->displayMenu();
 
-    cout << "\n\n";
+    cout << "\n";
 
     do {
+      util.printBlue(line);
       util.printOptions({ "Select Item", "Show Cart", "Back", "Exit" });
       util.printPointer();
       cin >> selection;
@@ -596,12 +643,9 @@ void App::handleCustomerCart() {
   if (((Customer*)user)->isCartEmpty()) {
     util.printRed("Your cart is empty.\n");
     util.printYellow("Press Enter to return to Customer dashboard...");
-    util.pressEnter();
     screen = SCREEN_CUSTOMER_MAIN_MENU;
     return;
   }
-
-  cout << "HERE\n";
 
   string header = user->getName() + "'s Cart\n";
   util.printBlue(header);
@@ -668,13 +712,13 @@ void App::handleCustomerCurrentOrder() {
     if (status == ORDER_STATUS_DISPATCHED) {
       if (selection == 1) {
         db.updateOrderStatus(((Customer*)user)->getCurrentOrder()->getId(), ORDER_STATUS_DELIVERED);
-        util.printGreen("Enjoy your meal!\n");
+        util.printGreen("Enjoy your meal!\n\n");
         util.printYellow("Press Enter to return to dashboard...");
-        util.pressEnter();
         screen = SCREEN_CUSTOMER_MAIN_MENU;
+        return;
       }
       else if (selection == 2) {
-        screen = SCREEN_RESTAURANT_MAIN_MENU;
+        screen = SCREEN_CUSTOMER_MAIN_MENU;
       }
     }
     else {
@@ -684,6 +728,8 @@ void App::handleCustomerCurrentOrder() {
     }
   }
   else {
-
+    util.printRed("You don't have any ongoing orders.\n");
+    util.printYellow("Press Enter to go back...");
+    screen = SCREEN_CUSTOMER_MAIN_MENU;
   }
 }
