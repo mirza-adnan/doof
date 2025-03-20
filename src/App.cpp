@@ -220,7 +220,7 @@ void App::handleCustomerRegister() {
   user = customer;
   screen = SCREEN_CUSTOMER_MAIN_MENU;
 
-  util.printGreen("\nRegistered successfully!\n");
+  util.printGreen("Registered successfully!\n");
   util.printYellow("Press Enter to continue...");
 }
 
@@ -290,6 +290,11 @@ void App::handleRestaurantRegister() {
 
   user = res;
   db.getRestaurants();
+
+  util.printGreen("Registered Successfully.\n");
+  util.printYellow("Press Enter to proceed to Dashboard\n");
+  util.pressEnter();
+
   screen = SCREEN_RESTAURANT_MAIN_MENU;
 }
 
@@ -397,7 +402,7 @@ void App::handleCustomerLogin() {
     else {
       util.clearConsole();
       util.printGreen("Logged in successfully.\n");
-      util.printYellow("\nPress Enter to continue...");
+      util.printYellow("Press Enter to continue...");
       screen = SCREEN_CUSTOMER_MAIN_MENU;
     }
   }
@@ -500,7 +505,8 @@ void App::handleRestaurantAddItem() {
   Food food(name, price, user->getId());
   ((Restaurant*)user)->addToMenu(food);
 
-  cout << "Item successfully added to the menu!\n";
+  cout << util.colors[COLOR_GREEN] << food.getName() << " was added to the menu.\n";
+  util.printYellow("Press Enter to go back...");
   util.pressEnter();
   screen = SCREEN_RESTAURANT_MAIN_MENU;
 }

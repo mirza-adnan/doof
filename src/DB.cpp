@@ -5,7 +5,7 @@
 class Customer;
 
 DB::DB() {
-  if (sqlite3_open("./db/doof.db", &db) != SQLITE_OK) {
+  if (sqlite3_open("./db/doof_prod.db", &db) != SQLITE_OK) {
     cerr << "Error opening database: " << sqlite3_errmsg(db) << "\n";
   }
 
@@ -279,8 +279,6 @@ bool DB::insertRestaurant(Restaurant& restaurant) const {
   const int restaurant_id = static_cast<int>(sqlite3_last_insert_rowid(db));
   restaurant.setId(restaurant_id);
 
-  cout << "Restaurant inserted successfully! Last inserted ID: " << restaurant_id << "\n";
-
   sqlite3_finalize(stmt);
 
   return success;
@@ -316,8 +314,6 @@ bool DB::insertCustomer(Customer& customer) const {
 
   const int customer_id = static_cast<int>(sqlite3_last_insert_rowid(db));
   customer.setId(customer_id);
-
-  cout << "Customer added to DB. ID: " << customer_id << "\n";
 
   sqlite3_finalize(stmt);
 
@@ -374,8 +370,6 @@ void DB::insertFood(Food& food) const {
 
   const int foodId = static_cast<int>(sqlite3_last_insert_rowid(db));
   food.setId(foodId);
-
-  cout << "Food inserted successfully with ID: " << foodId << "\n";
 
   sqlite3_finalize(stmt);
 }
